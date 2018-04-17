@@ -26,5 +26,11 @@ namespace FollowLifeHelpers
             public const string ACTIVITY = "ACV";
             public const string DIET = "DIE";
         }
+
+        public static class PLAN
+        {
+            public const string GENERAL = "GEN";
+            public const string PRO = "PRO";
+        }
     }
 }

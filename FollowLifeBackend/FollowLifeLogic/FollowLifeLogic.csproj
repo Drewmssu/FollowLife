@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="CipherLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TokenLogic.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
