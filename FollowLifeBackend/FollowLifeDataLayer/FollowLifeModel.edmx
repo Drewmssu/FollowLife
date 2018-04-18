@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="TestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="TestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Appointment">
           <Key>
             <PropertyRef Name="Id" />
@@ -24,8 +24,8 @@
           </Key>
           <Property Name="DeviceId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="DeviceToken" Type="varchar(max)" Nullable="false" />
-          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+          <Property Name="Token" Type="varchar(max)" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Doctor">
           <Key>
@@ -401,8 +401,7 @@
             <End Role="User" EntitySet="User" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TestModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -421,16 +420,6 @@
           <NavigationProperty Name="Doctor" Relationship="Self.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
           <NavigationProperty Name="Patient" Relationship="Self.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
           <NavigationProperty Name="Prescription" Relationship="Self.FK_Prescription_Appointment" FromRole="Appointment" ToRole="Prescription" />
-        </EntityType>
-        <EntityType Name="Device">
-          <Key>
-            <PropertyRef Name="DeviceId" />
-          </Key>
-          <Property Name="DeviceId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="DeviceToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="User" Relationship="Self.FK_Device_User" FromRole="Device" ToRole="User" />
         </EntityType>
         <EntityType Name="Doctor">
           <Key>
@@ -584,10 +573,10 @@
           <Property Name="SessionToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="LastIPConnection" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Device" Relationship="Self.FK_Device_User" FromRole="User" ToRole="Device" />
           <NavigationProperty Name="Doctor" Relationship="Self.FK_Doctor_User" FromRole="User" ToRole="Doctor" />
           <NavigationProperty Name="Patient" Relationship="Self.FK_Patient_User" FromRole="User" ToRole="Patient" />
           <NavigationProperty Name="Role" Relationship="Self.FK_User_Role" FromRole="User" ToRole="Role" />
+          <NavigationProperty Name="Device" Relationship="TestModel.FK_Device_User" FromRole="User" ToRole="Device" />
         </EntityType>
         <Association Name="FK_Appointment_Doctor">
           <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
@@ -622,18 +611,6 @@
             </Principal>
             <Dependent Role="Prescription">
               <PropertyRef Name="AppointmentId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Device_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Device" Type="Self.Device" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Device">
-              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -759,7 +736,6 @@
         </Association>
         <EntityContainer Name="FollowLifeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Appointment" EntityType="Self.Appointment" />
-          <EntitySet Name="Device" EntityType="Self.Device" />
           <EntitySet Name="Doctor" EntityType="Self.Doctor" />
           <EntitySet Name="DoctorMedicalSpeciality" EntityType="Self.DoctorMedicalSpeciality" />
           <EntitySet Name="Indicator" EntityType="Self.Indicator" />
@@ -784,10 +760,6 @@
           <AssociationSet Name="FK_Prescription_Appointment" Association="Self.FK_Prescription_Appointment">
             <End Role="Appointment" EntitySet="Appointment" />
             <End Role="Prescription" EntitySet="Prescription" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Device_User" Association="Self.FK_Device_User">
-            <End Role="User" EntitySet="User" />
-            <End Role="Device" EntitySet="Device" />
           </AssociationSet>
           <AssociationSet Name="FK_Doctor_Package" Association="Self.FK_Doctor_Package">
             <End Role="Plan" EntitySet="Plan" />
@@ -829,7 +801,34 @@
             <End Role="Role" EntitySet="Role" />
             <End Role="User" EntitySet="User" />
           </AssociationSet>
+          <EntitySet Name="Device" EntityType="TestModel.Device" />
+          <AssociationSet Name="FK_Device_User" Association="TestModel.FK_Device_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Device" EntitySet="Device" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="DeviceId" />
+          </Key>
+          <Property Name="DeviceId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Token" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="User" Relationship="TestModel.FK_Device_User" FromRole="Device" ToRole="User" />
+        </EntityType>
+        <Association Name="FK_Device_User">
+          <End Type="TestModel.User" Role="User" Multiplicity="1" />
+          <End Type="TestModel.Device" Role="Device" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Device">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -847,16 +846,6 @@
                 <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />
                 <ScalarProperty Name="Reason" ColumnName="Reason" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Device">
-            <EntityTypeMapping TypeName="TestModel.Device">
-              <MappingFragment StoreEntitySet="Device">
-                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="DeviceToken" ColumnName="DeviceToken" />
-                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1003,6 +992,16 @@
                 <ScalarProperty Name="SessionToken" ColumnName="SessionToken" />
                 <ScalarProperty Name="LastIPConnection" ColumnName="LastIPConnection" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Device">
+            <EntityTypeMapping TypeName="TestModel.Device">
+              <MappingFragment StoreEntitySet="Device">
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

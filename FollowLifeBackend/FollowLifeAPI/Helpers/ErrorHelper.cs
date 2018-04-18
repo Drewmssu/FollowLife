@@ -12,7 +12,8 @@ namespace FollowLifeAPI.Helpers
 {
     public class ErrorHelper
     {
-        public static (int Code, string Message) DEFAULT => (Code: 200, Message: "An error ocurred while performing an operation");
+        public static (int Code, string Message) DEFAULT => (Code: 100, Message: "An error ocurred while performing an operation");
+        public static (int Code, string Message) INVALID_MODEL_DATA => (Code: 101, Message: "Check the entered data");
         public static (int Code, string Message) STATUS_OK => (Code: 200, Message: "OK");
         public static (int Code, string Message) BAD_REQUEST => (Code: 400, Message: "Bad Request");
         public static (int Code, string Message) UNAUTHORIZED => (Code: 401, Message: "Unauthorized");

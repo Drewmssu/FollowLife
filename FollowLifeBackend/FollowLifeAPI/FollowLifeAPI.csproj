@@ -189,8 +189,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ConstantHelper.cs" />
+    <Compile Include="Helpers\Convert.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Models\Error.cs" />
+    <Compile Include="Models\Login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -296,10 +300,6 @@
     <ProjectReference Include="..\FollowLifeDataLayer\FollowLifeDataLayer.csproj">
       <Project>{3887dd15-cad6-413a-990d-711eae654f29}</Project>
       <Name>FollowLifeDataLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FollowLifeHelpers\FollowLifeHelpers.csproj">
-      <Project>{83010e21-65b0-4814-890d-a0c22b9625e8}</Project>
-      <Name>FollowLifeHelpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\FollowLifeLogic\FollowLifeLogic.csproj">
       <Project>{4ab03cbc-0ceb-4d6d-acc3-9dd272d0fcc8}</Project>

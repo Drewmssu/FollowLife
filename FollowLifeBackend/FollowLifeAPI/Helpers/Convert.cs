@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.ModelBinding;
+using System.Web;
+using System.Web.Http.ModelBinding;
 
-namespace FollowLifeHelpers
+namespace FollowLifeAPI.Helpers
 {
-    public static class ConvertHelper
+    public static class Convert
     {
         public static string ToSafeString(this object obj, string strDefault = "") => obj?.ToString() ?? strDefault;
         public static string ToTitleCase(this string str) => new System.Globalization.CultureInfo("en-US", false).TextInfo.ToTitleCase(str.ToLower());
@@ -24,6 +23,6 @@ namespace FollowLifeHelpers
             result.RemoveAll(string.IsNullOrEmpty);
 
             return result;
-        }    
+        }
     }
 }

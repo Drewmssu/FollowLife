@@ -16,8 +16,8 @@ namespace FollowLifeDataLayer
     {
         public int DeviceId { get; set; }
         public int UserId { get; set; }
-        public string DeviceToken { get; set; }
-        public System.DateTime CreationDate { get; set; }
+        public string Token { get; set; }
+        public System.DateTime CreatedAt { get; set; }
     
         public virtual User User { get; set; }
     }
