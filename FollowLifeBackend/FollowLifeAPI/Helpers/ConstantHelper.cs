@@ -19,6 +19,12 @@ namespace FollowLifeAPI.Helpers
 
         public static class ROLE
         {
+            public static class ID
+            {
+                public const int DOCTOR = 1;
+                public const int PATIENT = 2;
+            }
+
             public const string PATIENT = "PAT";
             public const string DOCTOR = "DOC";
         }

@@ -12,15 +12,18 @@ namespace FollowLifeDataLayer
     using System;
     using System.Collections.Generic;
     
-    public partial class Indicator
+    public partial class Membership
     {
         public int Id { get; set; }
-        public int PatientId { get; set; }
-        public Nullable<int> UniIfeasurementId { get; set; }
-        public Nullable<decimal> Quantity { get; set; }
+        public int DoctorId { get; set; }
+        public Nullable<int> PatientId { get; set; }
+        public string ReferencedEmail { get; set; }
+        public string Token { get; set; }
         public System.DateTime CreatedAt { get; set; }
+        public System.DateTime ExpiresAt { get; set; }
+        public string Status { get; set; }
     
+        public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }
-        public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
     }
 }

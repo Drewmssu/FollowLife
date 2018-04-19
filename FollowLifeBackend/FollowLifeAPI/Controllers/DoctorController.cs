@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Data.Entity;
 using FollowLifeLogic;
 using FollowLifeDataLayer;
+using FollowLifeAPI.Models.Doctor;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -132,7 +133,49 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("doctor/register")]
+        public async Task<IHttpActionResult> Register(Register model)
+        {
+            try
+            {
+                if (model is null)
+                    return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
 
+                #region Validation
+
+                model.Email = model.Email.ToLower();
+
+                if (await context.User.AnyAsync(x => x.Email == model.Email))
+                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
+
+                #endregion
+
+                var user = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    Password = model.Password,
+                    RoleId = ConstantHelper.ROLE.ID.DOCTOR,
+                    Status = ConstantHelper.STATUS.ACTIVE,
+                    CreatedAt = DateTime.Now,
+                    LastIPConnection = HttpContext.Current.Request.UserHostAddress,
+                    PhoneNumber = model.PhoneNumber
+                };
+
+                context.User.Add(user);
+                await context.SaveChangesAsync();
+
+                var doctor = new Doctor
+                {
+                    UserId = user.Id,
+
+                };
+            }
+            catch
+            {
+
+            }
+        }
 
     }
 

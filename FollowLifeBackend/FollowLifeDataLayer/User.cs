@@ -17,9 +17,9 @@ namespace FollowLifeDataLayer
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public User()
         {
+            this.Device = new HashSet<Device>();
             this.Doctor = new HashSet<Doctor>();
             this.Patient = new HashSet<Patient>();
-            this.Device = new HashSet<Device>();
         }
     
         public int Id { get; set; }
@@ -28,20 +28,20 @@ namespace FollowLifeDataLayer
         public int RoleId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string FullName { get; set; }
         public string Status { get; set; }
         public string PhoneNumber { get; set; }
         public string ProfilePicture { get; set; }
         public string SessionToken { get; set; }
         public string LastIPConnection { get; set; }
         public System.DateTime CreatedAt { get; set; }
+        public Nullable<System.DateTime> UpdatedOn { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Device> Device { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Doctor> Doctor { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Patient> Patient { get; set; }
         public virtual Role Role { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Device> Device { get; set; }
     }
 }

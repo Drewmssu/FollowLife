@@ -19,21 +19,23 @@ namespace FollowLifeDataLayer
         {
             this.Appointment = new HashSet<Appointment>();
             this.DoctorMedicalSpeciality = new HashSet<DoctorMedicalSpeciality>();
+            this.Membership = new HashSet<Membership>();
         }
     
         public int Id { get; set; }
         public int UserId { get; set; }
         public int PlanId { get; set; }
-        public string MembershipCode { get; set; }
         public string Status { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string MedicIdentification { get; set; }
+        public Nullable<System.DateTime> UpdatedAt { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointment { get; set; }
-        public virtual Plan Plan { get; set; }
-        public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Membership> Membership { get; set; }
+        public virtual User User { get; set; }
     }
 }

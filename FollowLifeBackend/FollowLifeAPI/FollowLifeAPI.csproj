@@ -193,6 +193,7 @@
     <Compile Include="Helpers\Convert.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Models\Doctor\Register.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -290,6 +291,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\Patient\" />
     <Folder Include="Upload\ProfileImages\" />
   </ItemGroup>
   <ItemGroup>
