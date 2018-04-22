@@ -38,8 +38,30 @@ namespace FollowLifeAPI.Helpers
 
         public static class PLAN
         {
-            public const string GENERAL = "GEN";
-            public const string PRO = "PRO";
+            public const string GENERAL_PATIENT = "GEP";
+            public const string PREMIUM_PATIENT = "PRP";
+            public const string GENERAL_DOCTOR = "GED";
+            public const string PREMIUM_DOCTOR = "PRD";
+            public const string EXTRA_PLAN = "EXT";
+
+            public static float GetPrice(string plan)
+            {
+                switch (plan)
+                {
+                    case GENERAL_PATIENT:
+                        return 0.00f;
+                    case PREMIUM_PATIENT:
+                        return 9.99f;
+                    case GENERAL_DOCTOR:
+                        return 39.99f;
+                    case PREMIUM_DOCTOR:
+                        return 59.99f;
+                    case EXTRA_PLAN:
+                        return 9.99f;
+                    default:
+                        return 0;
+                }
+            }
         }
 
         public static string GetDataConfiguration(string key) => string.IsNullOrEmpty(key) ? string.Empty : ConfigurationManager.AppSettings[key].ToSafeString();

@@ -168,14 +168,30 @@ namespace FollowLifeAPI.Controllers
                 var doctor = new Doctor
                 {
                     UserId = user.Id,
-
+                    Status = ConstantHelper.STATUS.ACTIVE,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
                 };
-            }
-            catch
-            {
 
+                context.Doctor.Add(doctor);
+                await context.SaveChangesAsync();
+
+                model.DoctorId = doctor.Id;
+                model.Password = "### HIDDEN ###";
+
+                return Ok(model);
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request data");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
             }
         }
+
+
 
     }
 

@@ -27,7 +27,6 @@ namespace FollowLifeDataLayer
     
         public virtual DbSet<Appointment> Appointment { get; set; }
         public virtual DbSet<Device> Device { get; set; }
-        public virtual DbSet<Doctor> Doctor { get; set; }
         public virtual DbSet<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
         public virtual DbSet<DoctorPlan> DoctorPlan { get; set; }
         public virtual DbSet<Indicator> Indicator { get; set; }
@@ -42,5 +41,6 @@ namespace FollowLifeDataLayer
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Doctor> Doctor { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace FollowLifeDataLayer
         public int DoctorId { get; set; }
         public int MedicalSpecialityId { get; set; }
     
-        public virtual Doctor Doctor { get; set; }
         public virtual MedicalSpeciality MedicalSpeciality { get; set; }
+        public virtual Doctor Doctor { get; set; }
     }
 }
