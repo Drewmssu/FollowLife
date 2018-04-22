@@ -102,5 +102,32 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("patient/logout")]
+        public async Task<IHttpActionResult> Logout()
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+
+                user.SessionToken = null;
+
+                await context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch
+            {
+                return new ErrorResult();
+            }
+        }
+
+
     }
 }
