@@ -23,7 +23,7 @@ namespace FollowLifeDataLayer
         public System.DateTime ExpiresAt { get; set; }
         public string Status { get; set; }
     
-        public virtual Patient Patient { get; set; }
         public virtual Doctor Doctor { get; set; }
+        public virtual Patient Patient { get; set; }
     }
 }

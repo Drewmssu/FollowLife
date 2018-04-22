@@ -197,6 +197,7 @@
     <Compile Include="Models\Doctor\Register.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Login.cs" />
+    <Compile Include="Models\Patient\Register.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -292,7 +293,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\Patient\" />
     <Folder Include="Upload\ProfileImages\" />
   </ItemGroup>
   <ItemGroup>

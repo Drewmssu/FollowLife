@@ -20,7 +20,7 @@ namespace FollowLifeDataLayer
         public Nullable<decimal> Quantity { get; set; }
         public System.DateTime CreatedAt { get; set; }
     
-        public virtual Patient Patient { get; set; }
         public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
+        public virtual Patient Patient { get; set; }
     }
 }

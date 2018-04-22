@@ -1,5 +1,6 @@
 ﻿using FollowLifeAPI.Helpers;
 using FollowLifeAPI.Models;
+using FollowLifeAPI.Models.Patient;
 using FollowLifeDataLayer;
 using FollowLifeLogic;
 using System;
@@ -128,6 +129,64 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("doctor/register")]
+        public async Task<IHttpActionResult> Register(Register model)
+        {
+            try
+            {
+                if (model is null)
+                    return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
 
+                #region Validation
+
+                model.Email = model.Email.ToLower();
+
+                if (await context.User.AnyAsync(x => x.Email == model.Email))
+                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
+
+                #endregion
+
+                var user = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    Password = model.Password,
+                    RoleId = ConstantHelper.ROLE.ID.PATIENT,
+                    Status = ConstantHelper.STATUS.ACTIVE,
+                    CreatedAt = DateTime.Now,
+                    LastIPConnection = HttpContext.Current.Request.UserHostAddress,
+                    PhoneNumber = model.PhoneNumber
+                };
+
+                context.User.Add(user);
+                await context.SaveChangesAsync();
+
+                var patient = new Patient
+                {
+                    UserId = user.Id,
+                    Status = ConstantHelper.STATUS.ACTIVE,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                context.Patient.Add(patient);
+                await context.SaveChangesAsync();
+
+                model.PatientId = patient.Id;
+                model.Password = "### HIDDEN ###";
+
+                return Ok(model);
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request data");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
     }
 }

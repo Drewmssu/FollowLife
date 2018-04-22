@@ -24,9 +24,10 @@ namespace FollowLifeDataLayer
     
         public int Id { get; set; }
         public int UserId { get; set; }
-        public int PackageId { get; set; }
+        public Nullable<int> PlanId { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string Status { get; set; }
+        public System.DateTime UpdatedAt { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointment { get; set; }

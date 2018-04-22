@@ -35,12 +35,12 @@ namespace FollowLifeDataLayer
         public virtual DbSet<MedicalSpeciality> MedicalSpeciality { get; set; }
         public virtual DbSet<Membership> Membership { get; set; }
         public virtual DbSet<Notification> Notification { get; set; }
-        public virtual DbSet<Patient> Patient { get; set; }
         public virtual DbSet<Plan> Plan { get; set; }
         public virtual DbSet<Prescription> Prescription { get; set; }
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Doctor> Doctor { get; set; }
+        public virtual DbSet<Patient> Patient { get; set; }
     }
 }
