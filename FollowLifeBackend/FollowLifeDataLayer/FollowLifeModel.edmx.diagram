@@ -5,25 +5,26 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="9fffa97f8a6540aa998c224356cdc8a1" Name="Diagram1">
-        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="13.5" PointY="9.25" />
-        <EntityTypeShape EntityType="TestModel.Device" Width="1.5" PointX="5.25" PointY="18" />
-        <EntityTypeShape EntityType="TestModel.Doctor" Width="1.5" PointX="8.25" PointY="9.125" />
-        <EntityTypeShape EntityType="TestModel.DoctorMedicalSpeciality" Width="1.5" PointX="10.5" PointY="5.875" />
-        <EntityTypeShape EntityType="TestModel.DoctorPlan" Width="1.5" PointX="11.75" PointY="1.875" />
-        <EntityTypeShape EntityType="TestModel.Frecuency" Width="1.5" PointX="0.75" PointY="13.875" />
-        <EntityTypeShape EntityType="TestModel.Indicator" Width="1.5" PointX="7.5" PointY="5.375" />
-        <EntityTypeShape EntityType="TestModel.IndicatorEntry" Width="1.5" PointX="9.75" PointY="2.875" />
-        <EntityTypeShape EntityType="TestModel.IndicatorType" Width="1.5" PointX="5.25" PointY="0.75" />
-        <EntityTypeShape EntityType="TestModel.Item" Width="1.5" PointX="18" PointY="9.375" />
-        <EntityTypeShape EntityType="TestModel.ItemType" Width="1.5" PointX="15.75" PointY="7" />
-        <EntityTypeShape EntityType="TestModel.MedicalSpeciality" Width="1.5" PointX="8.25" PointY="14" />
-        <EntityTypeShape EntityType="TestModel.Membership" Width="1.5" PointX="10.5" PointY="9.375" />
-        <EntityTypeShape EntityType="TestModel.Notification" Width="1.5" PointX="2.75" PointY="13.875" />
-        <EntityTypeShape EntityType="TestModel.Plan" Width="1.5" PointX="3" PointY="4.625" />
-        <EntityTypeShape EntityType="TestModel.Prescription" Width="1.5" PointX="15.75" PointY="9.625" />
-        <EntityTypeShape EntityType="TestModel.Role" Width="1.5" PointX="0.75" PointY="10" />
-        <EntityTypeShape EntityType="TestModel.UnitOfMeasurement" Width="1.5" PointX="3" PointY="1.375" />
-        <EntityTypeShape EntityType="TestModel.User" Width="1.5" PointX="3" PointY="8.75" />
+        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="13.5" PointY="8.625" />
+        <EntityTypeShape EntityType="TestModel.Device" Width="1.5" PointX="5.25" PointY="13.375" />
+        <EntityTypeShape EntityType="TestModel.District" Width="1.5" PointX="0.75" PointY="4.375" />
+        <EntityTypeShape EntityType="TestModel.Doctor" Width="1.5" PointX="5.25" PointY="8.375" />
+        <EntityTypeShape EntityType="TestModel.DoctorMedicalSpeciality" Width="1.5" PointX="10.5" PointY="9.125" />
+        <EntityTypeShape EntityType="TestModel.DoctorPlan" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TestModel.Frecuency" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TestModel.Indicator" Width="1.5" PointX="10.5" PointY="12.625" />
+        <EntityTypeShape EntityType="TestModel.IndicatorEntry" Width="1.5" PointX="12.75" PointY="13.125" />
+        <EntityTypeShape EntityType="TestModel.IndicatorType" Width="1.5" PointX="8.25" PointY="17" />
+        <EntityTypeShape EntityType="TestModel.Item" Width="1.5" PointX="18" PointY="8.625" />
+        <EntityTypeShape EntityType="TestModel.ItemType" Width="1.5" PointX="15.75" PointY="6.25" />
+        <EntityTypeShape EntityType="TestModel.MedicalSpeciality" Width="1.5" PointX="8.25" PointY="5.25" />
+        <EntityTypeShape EntityType="TestModel.Membership" Width="1.5" PointX="10.5" PointY="4.625" />
+        <EntityTypeShape EntityType="TestModel.Notification" Width="1.5" PointX="5.75" PointY="0.75" />
+        <EntityTypeShape EntityType="TestModel.Plan" Width="1.5" PointX="6" PointY="5" />
+        <EntityTypeShape EntityType="TestModel.Prescription" Width="1.5" PointX="15.75" PointY="9" />
+        <EntityTypeShape EntityType="TestModel.Role" Width="1.5" PointX="0.75" PointY="9.25" />
+        <EntityTypeShape EntityType="TestModel.UnitOfMeasurement" Width="1.5" PointX="6" PointY="17.25" />
+        <EntityTypeShape EntityType="TestModel.User" Width="1.5" PointX="3" PointY="8" />
         <AssociationConnector Association="TestModel.FK_Appointment_Doctor" />
         <AssociationConnector Association="TestModel.FK_Prescription_Appointment" />
         <AssociationConnector Association="TestModel.FK_Device_User" />
@@ -37,16 +38,15 @@
         <AssociationConnector Association="TestModel.FK_Item_ItemType" />
         <AssociationConnector Association="TestModel.FK_Item_Prescription" />
         <AssociationConnector Association="TestModel.FK_User_Role" />
-        <EntityTypeShape EntityType="TestModel.Address" Width="1.5" PointX="12.625" PointY="14" />
-        <EntityTypeShape EntityType="TestModel.District" Width="1.5" PointX="10.375" PointY="14.5" />
-        <AssociationConnector Association="TestModel.FK_Address_District" />
-        <AssociationConnector Association="TestModel.FK_Doctor_Address" />
-        <EntityTypeShape EntityType="TestModel.Patient" Width="1.5" PointX="5.25" PointY="7" />
+        <EntityTypeShape EntityType="TestModel.Patient" Width="1.5" PointX="8.25" PointY="8.75" />
         <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
         <AssociationConnector Association="TestModel.FK_Indicator_Patient" />
         <AssociationConnector Association="TestModel.FK_Membership_Patient" />
         <AssociationConnector Association="TestModel.FK_Patient_Package" />
         <AssociationConnector Association="TestModel.FK_Patient_User" />
+        <EntityTypeShape EntityType="TestModel.Address" Width="1.5" PointX="3" PointY="3.625" />
+        <AssociationConnector Association="TestModel.FK_Address_District" />
+        <AssociationConnector Association="TestModel.FK_Doctor_Address" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

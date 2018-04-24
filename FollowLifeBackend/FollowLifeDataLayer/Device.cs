@@ -14,7 +14,7 @@ namespace FollowLifeDataLayer
     
     public partial class Device
     {
-        public int DeviceId { get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string Token { get; set; }
         public System.DateTime CreatedAt { get; set; }

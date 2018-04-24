@@ -237,7 +237,58 @@ namespace FollowLifeAPI.Controllers
             {
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+                    var doctor = user.Doctor.FirstOrDefault();
+                    var address = doctor.Address;
+
+                    if (model.ProfileImage != null)
+                    {
+                        var image = ImageHelper.UploadImage(model.ProfileImage);
+                        if (image != null)
+                            user.ProfilePicture = image;
+                    }
+
+                    await context.SaveChangesAsync();
+
+                    if (model.District.HasValue)
+                    {
+                        if (address is null)
+                        {
+                            address = new Address
+                            {
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now
+                            };
+
+                            context.Address.Add(address);
+                        }
+                        else
+                        {
+                            address.UpdatedAt = DateTime.Now;
+                        }
+
+                        address.DistrictId = model.District.Value;
+                        address.Street = model.Street;
+                        address.Neighborhood = model.Neighborhood;
+                        address.Number = model.Number;
+                        address.Complement = model.Complement;
+
+                        await context.SaveChangesAsync();
+                    }
+
+
+
                 }
             }
             catch

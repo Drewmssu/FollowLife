@@ -14,8 +14,10 @@
           <Property Name="Street" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="Neighborhood" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="Complement" Type="varchar" MaxLength="100" />
-          <Property Name="Number" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="Number" Type="varchar" MaxLength="5" Nullable="false" />
           <Property Name="Status" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Appointment">
           <Key>
@@ -32,9 +34,9 @@
         </EntityType>
         <EntityType Name="Device">
           <Key>
-            <PropertyRef Name="DeviceId" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="DeviceId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="Token" Type="varchar(max)" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
@@ -181,6 +183,7 @@
           <Property Name="Age" Type="varchar" MaxLength="3" />
           <Property Name="BloodType" Type="varchar" MaxLength="2" />
           <Property Name="Weight" Type="varchar" MaxLength="3" />
+          <Property Name="Sex" Type="varchar" MaxLength="8" />
         </EntityType>
         <EntityType Name="Plan">
           <Key>
@@ -230,7 +233,7 @@
           <Property Name="FirstName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="LastName" Type="varchar" MaxLength="150" Nullable="false" />
           <Property Name="Status" Type="varchar" MaxLength="3" Nullable="false" />
-          <Property Name="PhoneNumber" Type="varchar" MaxLength="15" Nullable="false" />
+          <Property Name="PhoneNumber" Type="varchar" MaxLength="15" />
           <Property Name="ProfilePicture" Type="varchar" MaxLength="250" />
           <Property Name="SessionToken" Type="varchar(max)" />
           <Property Name="LastIPConnection" Type="varchar" MaxLength="15" />
@@ -588,6 +591,7 @@
         <EntityContainer Name="FollowLifeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Appointment" EntityType="TestModel.Appointment" />
           <EntitySet Name="Device" EntityType="TestModel.Device" />
+          <EntitySet Name="District" EntityType="TestModel.District" />
           <EntitySet Name="Doctor" EntityType="TestModel.Doctor" />
           <EntitySet Name="DoctorMedicalSpeciality" EntityType="TestModel.DoctorMedicalSpeciality" />
           <EntitySet Name="DoctorPlan" EntityType="TestModel.DoctorPlan" />
@@ -657,16 +661,6 @@
             <End Role="Role" EntitySet="Role" />
             <End Role="User" EntitySet="User" />
           </AssociationSet>
-          <EntitySet Name="Address" EntityType="TestModel.Address" />
-          <EntitySet Name="District" EntityType="TestModel.District" />
-          <AssociationSet Name="FK_Address_District" Association="TestModel.FK_Address_District">
-            <End Role="District" EntitySet="District" />
-            <End Role="Address" EntitySet="Address" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Doctor_Address" Association="TestModel.FK_Doctor_Address">
-            <End Role="Address" EntitySet="Address" />
-            <End Role="Doctor" EntitySet="Doctor" />
-          </AssociationSet>
           <EntitySet Name="Patient" EntityType="TestModel.Patient" />
           <AssociationSet Name="FK_Appointment_Patient" Association="TestModel.FK_Appointment_Patient">
             <End Role="Patient" EntitySet="Patient" />
@@ -688,6 +682,15 @@
             <End Role="User" EntitySet="User" />
             <End Role="Patient" EntitySet="Patient" />
           </AssociationSet>
+          <EntitySet Name="Address" EntityType="TestModel.Address" />
+          <AssociationSet Name="FK_Address_District" Association="TestModel.FK_Address_District">
+            <End Role="District" EntitySet="District" />
+            <End Role="Address" EntitySet="Address" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Doctor_Address" Association="TestModel.FK_Doctor_Address">
+            <End Role="Address" EntitySet="Address" />
+            <End Role="Doctor" EntitySet="Doctor" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Appointment">
           <Key>
@@ -707,13 +710,21 @@
         </EntityType>
         <EntityType Name="Device">
           <Key>
-            <PropertyRef Name="DeviceId" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="DeviceId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="Token" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="User" Relationship="TestModel.FK_Device_User" FromRole="Device" ToRole="User" />
+        </EntityType>
+        <EntityType Name="District">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Address" Relationship="TestModel.FK_Address_District" FromRole="District" ToRole="Address" />
         </EntityType>
         <EntityType Name="Doctor">
           <Key>
@@ -909,7 +920,7 @@
           <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="LastName" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
-          <Property Name="PhoneNumber" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
           <Property Name="ProfilePicture" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="SessionToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="LastIPConnection" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
@@ -1076,52 +1087,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="Address">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DistrictId" Type="Int32" Nullable="false" />
-          <Property Name="Street" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Neighborhood" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Complement" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Number" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="District" Relationship="TestModel.FK_Address_District" FromRole="Address" ToRole="District" />
-          <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Doctor_Address" FromRole="Address" ToRole="Doctor" />
-        </EntityType>
-        <EntityType Name="District">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Address" Relationship="TestModel.FK_Address_District" FromRole="District" ToRole="Address" />
-        </EntityType>
-        <Association Name="FK_Address_District">
-          <End Type="TestModel.District" Role="District" Multiplicity="1" />
-          <End Type="TestModel.Address" Role="Address" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="District">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Address">
-              <PropertyRef Name="DistrictId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Doctor_Address">
-          <End Type="TestModel.Address" Role="Address" Multiplicity="0..1" />
-          <End Type="TestModel.Doctor" Role="Doctor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Address">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Doctor">
-              <PropertyRef Name="AddressId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="Patient">
           <Key>
             <PropertyRef Name="Id" />
@@ -1135,6 +1100,7 @@
           <Property Name="Age" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
           <Property Name="BloodType" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
           <Property Name="Weight" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Appointment" Relationship="TestModel.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
           <NavigationProperty Name="Indicator" Relationship="TestModel.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
           <NavigationProperty Name="Membership" Relationship="TestModel.FK_Membership_Patient" FromRole="Patient" ToRole="Membership" />
@@ -1201,6 +1167,46 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Address">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DistrictId" Type="Int32" Nullable="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Neighborhood" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Complement" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Number" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="District" Relationship="TestModel.FK_Address_District" FromRole="Address" ToRole="District" />
+          <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Doctor_Address" FromRole="Address" ToRole="Doctor" />
+        </EntityType>
+        <Association Name="FK_Address_District">
+          <End Type="TestModel.District" Role="District" Multiplicity="1" />
+          <End Type="TestModel.Address" Role="Address" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="District">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Address">
+              <PropertyRef Name="DistrictId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Doctor_Address">
+          <End Type="TestModel.Address" Role="Address" Multiplicity="0..1" />
+          <End Type="TestModel.Doctor" Role="Doctor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Address">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Doctor">
+              <PropertyRef Name="AddressId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1227,7 +1233,15 @@
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="Token" ColumnName="Token" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="District">
+            <EntityTypeMapping TypeName="TestModel.District">
+              <MappingFragment StoreEntitySet="District">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1425,30 +1439,10 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Address">
-            <EntityTypeMapping TypeName="TestModel.Address">
-              <MappingFragment StoreEntitySet="Address">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Number" ColumnName="Number" />
-                <ScalarProperty Name="Complement" ColumnName="Complement" />
-                <ScalarProperty Name="Neighborhood" ColumnName="Neighborhood" />
-                <ScalarProperty Name="Street" ColumnName="Street" />
-                <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="District">
-            <EntityTypeMapping TypeName="TestModel.District">
-              <MappingFragment StoreEntitySet="District">
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Patient">
             <EntityTypeMapping TypeName="TestModel.Patient">
               <MappingFragment StoreEntitySet="Patient">
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
                 <ScalarProperty Name="Weight" ColumnName="Weight" />
                 <ScalarProperty Name="BloodType" ColumnName="BloodType" />
                 <ScalarProperty Name="Age" ColumnName="Age" />
@@ -1457,6 +1451,21 @@
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="PlanId" ColumnName="PlanId" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Address">
+            <EntityTypeMapping TypeName="TestModel.Address">
+              <MappingFragment StoreEntitySet="Address">
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Number" ColumnName="Number" />
+                <ScalarProperty Name="Complement" ColumnName="Complement" />
+                <ScalarProperty Name="Neighborhood" ColumnName="Neighborhood" />
+                <ScalarProperty Name="Street" ColumnName="Street" />
+                <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -12,7 +12,7 @@ namespace FollowLifeAPI.Helpers
     {
         public static string GetImageURL(string fileName) => string.IsNullOrEmpty(fileName) ? null : HttpContext.Current.Server.MapPath("~\\Upload\\ProfileImages\\" + fileName);
 
-        public static string UploadImage(HttpPostedFile file)
+        public static string UploadImage(HttpPostedFileBase file)
         {
             using (var client = new HttpClient())
             {
