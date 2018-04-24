@@ -199,9 +199,10 @@
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Models\Doctor\Profile.cs" />
     <Compile Include="Models\Doctor\Register.cs" />
-    <Compile Include="Models\Element\Element.cs" />
+    <Compile Include="Models\Repository\Element.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Login.cs" />
+    <Compile Include="Models\Patient\Profile.cs" />
     <Compile Include="Models\Patient\Register.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

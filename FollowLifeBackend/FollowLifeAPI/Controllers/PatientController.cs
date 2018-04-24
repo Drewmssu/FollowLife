@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Web;
 using System.Web.Http;
 
@@ -220,5 +221,59 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult();
             }
         }
+
+        [HttpPut]
+        [Route("patient/profile")]
+        public async Task<IHttpActionResult> Profile(Profile model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+                    var patient = user.Patient.FirstOrDefault();
+
+                    if (model.ProfileImage != null)
+                    {
+                        var image = ImageHelper.UploadImage(model.ProfileImage);
+                        if (image != null)
+                            user.ProfilePicture = image;
+                    }
+
+                    await context.SaveChangesAsync();
+
+                    var result = new
+                    {
+                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                        phoneNumber = user.PhoneNumber,
+                    };
+
+                    transaction.Complete();
+
+                    return Ok(result);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+
     }
 }
