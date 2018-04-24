@@ -22,5 +22,8 @@ namespace FollowLifeAPI.Models.Doctor
         [MaxLength(100)]
         public string Street { get; set; } = string.Empty;
         public int? District { get; set; }
+
+        //Medical Specialities
+        public int[] DoctorMedicalSpeciality { get; set; }
     }
 }

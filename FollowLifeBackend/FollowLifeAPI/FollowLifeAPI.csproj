@@ -189,6 +189,7 @@
     <Compile Include="Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
+    <Compile Include="Controllers\RepositoryController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -198,6 +199,7 @@
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Models\Doctor\Profile.cs" />
     <Compile Include="Models\Doctor\Register.cs" />
+    <Compile Include="Models\Element\Element.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\Patient\Register.cs" />

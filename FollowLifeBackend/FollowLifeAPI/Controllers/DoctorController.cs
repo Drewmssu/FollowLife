@@ -287,16 +287,53 @@ namespace FollowLifeAPI.Controllers
                         await context.SaveChangesAsync();
                     }
 
+                    context.DoctorMedicalSpeciality.RemoveRange(doctor.DoctorMedicalSpeciality);
+                    await context.SaveChangesAsync();
 
+                    if (model.DoctorMedicalSpeciality.Length > 0)
+                    {
+                        foreach (var dms in model.DoctorMedicalSpeciality)
+                        {
+                            context.DoctorMedicalSpeciality.Add(new DoctorMedicalSpeciality
+                            {
+                                DoctorId = doctor.Id,
+                                MedicalSpecialityId = dms
+                            });
+                        }
 
+                        await context.SaveChangesAsync();
+                    }
+
+                    var result = new
+                    {
+                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                        phoneNumber = user.PhoneNumber,
+
+                        district = address?.District.Id,
+                        street = address?.Street,
+                        complement = address?.Complement,
+                        number = address?.Number,
+                        neighborhood = address.Neighborhood,
+
+                        medicalSpecialities = doctor.DoctorMedicalSpeciality.Select(x => x.Id)
+                    };
+
+                    transaction.Complete();
+
+                    return Ok(result);
                 }
             }
-            catch
+            catch (ArgumentNullException)
             {
-
-                throw;
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
             }
         }
+
+
     }
 
 }
