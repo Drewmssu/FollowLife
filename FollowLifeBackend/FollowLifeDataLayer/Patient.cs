@@ -28,6 +28,9 @@ namespace FollowLifeDataLayer
         public System.DateTime CreatedAt { get; set; }
         public string Status { get; set; }
         public System.DateTime UpdatedAt { get; set; }
+        public string Age { get; set; }
+        public string BloodType { get; set; }
+        public string Weight { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointment { get; set; }

@@ -17,7 +17,7 @@ namespace FollowLifeDataLayer
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public UnitOfMeasurement()
         {
-            this.Indicator = new HashSet<Indicator>();
+            this.IndicatorType = new HashSet<IndicatorType>();
         }
     
         public int Id { get; set; }
@@ -25,6 +25,6 @@ namespace FollowLifeDataLayer
         public string Code { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Indicator> Indicator { get; set; }
+        public virtual ICollection<IndicatorType> IndicatorType { get; set; }
     }
 }

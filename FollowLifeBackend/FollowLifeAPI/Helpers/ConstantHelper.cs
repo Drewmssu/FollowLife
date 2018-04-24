@@ -15,6 +15,7 @@ namespace FollowLifeAPI.Helpers
             public const string ACTIVE = "ACT";
             public const string INACTIVE = "INA";
             public const string CONFIRMED = "CON";
+            public const string EXPIRED = "EXP";
         }
 
         public static class ROLE

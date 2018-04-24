@@ -12,26 +12,21 @@ namespace FollowLifeDataLayer
     using System;
     using System.Collections.Generic;
     
-    public partial class Appointment
+    public partial class IndicatorType
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Appointment()
+        public IndicatorType()
         {
-            this.Prescription = new HashSet<Prescription>();
+            this.Indicator = new HashSet<Indicator>();
         }
     
         public int Id { get; set; }
-        public Nullable<int> PatientId { get; set; }
-        public Nullable<int> DoctorId { get; set; }
-        public System.DateTime CratedAt { get; set; }
-        public System.DateTime AppointmentDate { get; set; }
-        public Nullable<System.DateTime> CanceledAt { get; set; }
-        public string Reason { get; set; }
-        public string Status { get; set; }
+        public int UnitofMeasurementId { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
     
-        public virtual Doctor Doctor { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Prescription> Prescription { get; set; }
-        public virtual Patient Patient { get; set; }
+        public virtual ICollection<Indicator> Indicator { get; set; }
+        public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
     }
 }

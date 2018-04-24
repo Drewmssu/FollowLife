@@ -12,26 +12,24 @@ namespace FollowLifeDataLayer
     using System;
     using System.Collections.Generic;
     
-    public partial class Appointment
+    public partial class Address
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Appointment()
+        public Address()
         {
-            this.Prescription = new HashSet<Prescription>();
+            this.Doctor = new HashSet<Doctor>();
         }
     
         public int Id { get; set; }
-        public Nullable<int> PatientId { get; set; }
-        public Nullable<int> DoctorId { get; set; }
-        public System.DateTime CratedAt { get; set; }
-        public System.DateTime AppointmentDate { get; set; }
-        public Nullable<System.DateTime> CanceledAt { get; set; }
-        public string Reason { get; set; }
+        public int DistrictId { get; set; }
+        public string Street { get; set; }
+        public string Neighborhood { get; set; }
+        public string Complement { get; set; }
+        public string Number { get; set; }
         public string Status { get; set; }
     
-        public virtual Doctor Doctor { get; set; }
+        public virtual District District { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Prescription> Prescription { get; set; }
-        public virtual Patient Patient { get; set; }
+        public virtual ICollection<Doctor> Doctor { get; set; }
     }
 }

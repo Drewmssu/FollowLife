@@ -12,13 +12,13 @@ namespace FollowLifeDataLayer
     using System;
     using System.Collections.Generic;
     
-    public partial class DoctorMedicalSpeciality
+    public partial class IndicatorEntry
     {
         public int Id { get; set; }
-        public int DoctorId { get; set; }
-        public int MedicalSpecialityId { get; set; }
+        public int IndicatorId { get; set; }
+        public string Value { get; set; }
+        public System.DateTime CreatedAt { get; set; }
     
-        public virtual Doctor Doctor { get; set; }
-        public virtual MedicalSpeciality MedicalSpeciality { get; set; }
+        public virtual Indicator Indicator { get; set; }
     }
 }

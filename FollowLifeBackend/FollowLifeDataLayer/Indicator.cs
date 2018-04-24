@@ -14,13 +14,23 @@ namespace FollowLifeDataLayer
     
     public partial class Indicator
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Indicator()
+        {
+            this.IndicatorEntry = new HashSet<IndicatorEntry>();
+        }
+    
         public int Id { get; set; }
         public int PatientId { get; set; }
         public Nullable<int> UniIfeasurementId { get; set; }
         public Nullable<decimal> Quantity { get; set; }
         public System.DateTime CreatedAt { get; set; }
+        public int IndicatorTypeId { get; set; }
+        public string Frecuency { get; set; }
     
-        public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
+        public virtual IndicatorType IndicatorType { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<IndicatorEntry> IndicatorEntry { get; set; }
         public virtual Patient Patient { get; set; }
     }
 }

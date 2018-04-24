@@ -11,6 +11,8 @@ using System.Data.Entity;
 using FollowLifeLogic;
 using FollowLifeDataLayer;
 using FollowLifeAPI.Models.Doctor;
+using FollowLifeAPI.BE;
+using System.Transactions;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -191,8 +193,59 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("doctor/profile")]
+        public async Task<IHttpActionResult> Profile()
+        {
+            try
+            {
+                var userId = GetUserId();
 
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
+                var user = await context.User.FindAsync(userId);
+                var doctor = user?.Doctor.FirstOrDefault();
+
+                if (doctor != null)
+                    return Ok(new
+                    {
+                        firstName = user.FirstName,
+                        lastName = user.LastName,
+                        phoneNumber = user.PhoneNumber,
+                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                        email = user.Email,
+                        medicIdentification = doctor.MedicIdentification,
+                        address = new AddressBE().Fill(doctor.Address),
+                        medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
+                        numberOfPatients = doctor.Membership.Where(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED).Count()
+                    });
+
+                throw new Exception();
+            }
+            catch
+            {
+                return new ErrorResult();
+            }
+        }
+
+        [HttpPut]
+        [Route("doctor/profile")]
+        public async Task<IHttpActionResult> Profile(Profile model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    
+                }
+            }
+            catch
+            {
+
+                throw;
+            }
+        }
     }
 
 }

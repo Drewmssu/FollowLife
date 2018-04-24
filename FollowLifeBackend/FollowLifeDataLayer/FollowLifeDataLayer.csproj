@@ -49,10 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Address.cs">
+      <DependentUpon>FollowLifeModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Appointment.cs">
       <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Device.cs">
+      <DependentUpon>FollowLifeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="District.cs">
       <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Doctor.cs">
@@ -79,7 +85,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FollowLifeModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Frecuency.cs">
+      <DependentUpon>FollowLifeModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Indicator.cs">
+      <DependentUpon>FollowLifeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="IndicatorEntry.cs">
+      <DependentUpon>FollowLifeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="IndicatorType.cs">
       <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Item.cs">

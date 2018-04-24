@@ -130,7 +130,7 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpPost]
-        [Route("doctor/register")]
+        [Route("patient/register")]
         public async Task<IHttpActionResult> Register(Register model)
         {
             try
@@ -186,6 +186,38 @@ namespace FollowLifeAPI.Controllers
             catch (Exception ex)
             {
                 return new ErrorResult(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("patient/profile")]
+        public async Task<IHttpActionResult> Profile()
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+                var patient = user?.Patient.FirstOrDefault();
+
+                if (patient != null)
+                    return Ok(new
+                    {
+                        firstName = user.FirstName,
+                        lastName = user.LastName,
+                        phoneNumber = user.PhoneNumber,
+                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                        email = user.Email
+                    });
+
+                throw new Exception();
+            }
+            catch
+            {
+                return new ErrorResult();
             }
         }
     }
