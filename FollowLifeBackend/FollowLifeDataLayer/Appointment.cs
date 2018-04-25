@@ -30,8 +30,8 @@ namespace FollowLifeDataLayer
         public string Status { get; set; }
     
         public virtual Doctor Doctor { get; set; }
+        public virtual Patient Patient { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Prescription> Prescription { get; set; }
-        public virtual Patient Patient { get; set; }
     }
 }

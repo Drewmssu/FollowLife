@@ -252,6 +252,10 @@ namespace FollowLifeAPI.Controllers
                     var doctor = user.Doctor.FirstOrDefault();
                     var address = doctor.Address;
 
+                    user.PhoneNumber = model.PhoneNumber;
+
+                    await context.SaveChangesAsync();
+
                     if (model.ProfileImage != null)
                     {
                         var image = ImageHelper.UploadImage(model.ProfileImage);
@@ -307,7 +311,7 @@ namespace FollowLifeAPI.Controllers
                     var result = new
                     {
                         profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                        phoneNumber = user.PhoneNumber,
+                        phoneNumber = model.PhoneNumber,
 
                         district = address?.District.Id,
                         street = address?.Street,

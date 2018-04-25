@@ -24,13 +24,14 @@ namespace FollowLifeDataLayer
     
         public int Id { get; set; }
         public int UserId { get; set; }
-        public Nullable<int> PlanId { get; set; }
+        public int PlanId { get; set; }
         public string Status { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public string MedicIdentification { get; set; }
         public Nullable<System.DateTime> UpdatedAt { get; set; }
         public Nullable<int> AddressId { get; set; }
     
+        public virtual Address Address { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointment { get; set; }
         public virtual User User { get; set; }
@@ -38,6 +39,5 @@ namespace FollowLifeDataLayer
         public virtual ICollection<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Membership> Membership { get; set; }
-        public virtual Address Address { get; set; }
     }
 }

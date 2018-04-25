@@ -30,8 +30,9 @@ namespace FollowLifeDataLayer
         public System.DateTime UpdatedAt { get; set; }
         public string Age { get; set; }
         public string BloodType { get; set; }
-        public string Weight { get; set; }
+        public Nullable<decimal> Weight { get; set; }
         public string Sex { get; set; }
+        public Nullable<decimal> Height { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Appointment> Appointment { get; set; }

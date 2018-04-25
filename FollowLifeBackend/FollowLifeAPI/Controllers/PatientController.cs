@@ -244,6 +244,15 @@ namespace FollowLifeAPI.Controllers
                     var user = await context.User.FindAsync(userId);
                     var patient = user.Patient.FirstOrDefault();
 
+                    user.PhoneNumber = model.PhoneNumber;
+                    patient.Age = model.Age;
+                    patient.Weight = model.Weight;
+                    patient.Height = model.Height;
+                    patient.BloodType = model.BloodType;
+                    patient.Sex = model.Sex;
+
+                    await context.SaveChangesAsync();
+
                     if (model.ProfileImage != null)
                     {
                         var image = ImageHelper.UploadImage(model.ProfileImage);
@@ -257,6 +266,11 @@ namespace FollowLifeAPI.Controllers
                     {
                         profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
                         phoneNumber = user.PhoneNumber,
+                        age = patient.Age,
+                        weight = patient.Weight,
+                        height = patient.Height,
+                        sex = patient.Sex,
+                        bloodType = patient.BloodType,
                     };
 
                     transaction.Complete();
