@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FollowLifeService.MailChimp
 {
-    public static class MailService
+    public class MailService
     {
 
     }
