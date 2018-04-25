@@ -152,7 +152,7 @@ namespace FollowLifeAPI.Controllers
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    Email = model.Email,
+                    Email = model.Email.ToLower(),
                     Password = model.Password,
                     RoleId = ConstantHelper.ROLE.ID.PATIENT,
                     Status = ConstantHelper.STATUS.ACTIVE,

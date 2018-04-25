@@ -316,6 +316,10 @@
       <Project>{4ab03cbc-0ceb-4d6d-acc3-9dd272d0fcc8}</Project>
       <Name>FollowLifeLogic</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FollowLifeService\FollowLifeService.csproj">
+      <Project>{82001823-fe6e-4fd8-b88b-cc8700e2e537}</Project>
+      <Name>FollowLifeService</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

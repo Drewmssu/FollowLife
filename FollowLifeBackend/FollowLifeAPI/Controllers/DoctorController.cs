@@ -13,6 +13,7 @@ using FollowLifeDataLayer;
 using FollowLifeAPI.Models.Doctor;
 using FollowLifeAPI.BE;
 using System.Transactions;
+using FollowLifeService.MailJet;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -360,7 +361,13 @@ namespace FollowLifeAPI.Controllers
                     var doctor = user.Doctor.FirstOrDefault();
 
                     model.Email = model.Email.ToLower();
-                    var expirationDate = DateTime.Now.AddDays(1);
+
+                    var patient = await context.Patient.FirstOrDefaultAsync(x => x.User.Email == model.Email);
+
+                    if (patient is null)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "There is no patient with that email");
+
+                    var expirationDate = DateTime.Now.AddHours(24);
 
                     var membership = new Membership
                     {
@@ -372,12 +379,34 @@ namespace FollowLifeAPI.Controllers
                         Token = TokenLogic.GenerateMembershipToken(),
                     };
 
+                    var emailResult = await MailService.SendMembershipEmail(membership.ReferencedEmail, patient.User.FirstName, membership.Token);
+
+                    if (emailResult != "success")
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email could not be sent, please try again");
+
+                    context.Membership.Add(membership);
+                    await context.SaveChangesAsync();
+
+                    transaction.Complete();
+
+                    var result = new
+                    {
+                        expirationDate = membership.ExpiresAt
+                    };
+
+                    return Ok(result);
 
                 }
                 catch (ArgumentNullException)
-                {                    
-                    throw;
+                {
+                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
                 }
+                catch (Exception ex)
+                {
+                    return new ErrorResult(ex.Message);
+                }
+                
+                    
 
             }
 
