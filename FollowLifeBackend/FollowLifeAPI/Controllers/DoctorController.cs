@@ -265,7 +265,7 @@ namespace FollowLifeAPI.Controllers
 
                     await context.SaveChangesAsync();
 
-                    if (model.District.HasValue)
+                    if (!model.District.HasValue)
                     {
                         if (address is null)
                         {
@@ -369,8 +369,10 @@ namespace FollowLifeAPI.Controllers
                         DoctorId = doctor.Id,
                         Status = ConstantHelper.STATUS.ACTIVE,
                         ReferencedEmail = model.Email,
-                        
+                        Token = TokenLogic.GenerateMembershipToken(),
                     };
+
+
                 }
                 catch (ArgumentNullException)
                 {                    
