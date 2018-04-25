@@ -197,6 +197,7 @@
     <Compile Include="Helpers\Convert.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Models\Doctor\GenerateMembership.cs" />
     <Compile Include="Models\Doctor\Profile.cs" />
     <Compile Include="Models\Doctor\Register.cs" />
     <Compile Include="Models\Repository\Element.cs" />

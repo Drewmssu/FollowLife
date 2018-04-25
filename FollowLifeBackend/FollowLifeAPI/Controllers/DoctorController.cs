@@ -337,7 +337,52 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("doctor/membership")]
+        public async Task<IHttpActionResult> GenerateMembership(GenerateMembership model)
+        {
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                try
+                {
+                    if (model is null)
+                        throw new ArgumentNullException();
 
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA);
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+                    var doctor = user.Doctor.FirstOrDefault();
+
+                    model.Email = model.Email.ToLower();
+                    var expirationDate = DateTime.Now.AddDays(1);
+
+                    var membership = new Membership
+                    {
+                        CreatedAt = DateTime.Now,
+                        ExpiresAt = expirationDate,
+                        DoctorId = doctor.Id,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                        ReferencedEmail = model.Email,
+                        
+                    };
+                }
+                catch (ArgumentNullException)
+                {                    
+                    throw;
+                }
+
+            }
+
+                
+        }
     }
 
 }
+
+
