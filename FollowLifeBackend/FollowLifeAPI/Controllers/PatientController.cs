@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using System.Web;
 using System.Web.Http;
+using FollowLifeAPI.BE;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -348,5 +349,71 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("patient/appointments")]
+        [Route("patient/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> GetAppointments(int? appointmentId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var patient = user.Patient.FirstOrDefault();
+
+                if (appointmentId.HasValue)
+                {
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    if (appointment.Status is ConstantHelper.STATUS.INACTIVE)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "Appointment not available");
+
+                    if (appointment.PatientId != patient.Id)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED, "Current user is not part of this appointment");
+
+                    if (appointment.AppointmentDate < DateTime.Now)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment has expired");
+
+                    return Ok(new
+                    {
+                        createdAt = appointment.CreatedAt,
+                        appointmentDate = appointment.AppointmentDate,
+                        reason = appointment.Reason,
+                        patient = new DoctorBE().Fill(appointment.Doctor)
+                    });
+                }
+
+                var today = DateTime.Now;
+                var result = context.Appointment.Where(x => x.PatientId == patient.Id &&
+                                                            x.Status == ConstantHelper.STATUS.ACTIVE &&
+                                                            x.AppointmentDate >= today)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        date = x.AppointmentDate,
+                        reason = x.Reason,
+                        doctor = new DoctorBE().Fill(x.Doctor)
+                    });
+
+                return Ok(result);
+
+            }
+            catch
+            {
+                return new ErrorResult();
+            }
+        }
+
     }
 }

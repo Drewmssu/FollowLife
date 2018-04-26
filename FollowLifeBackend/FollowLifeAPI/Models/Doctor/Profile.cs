@@ -24,6 +24,6 @@ namespace FollowLifeAPI.Models.Doctor
         public int? District { get; set; }
 
         //Medical Specialities
-        public int[] DoctorMedicalSpeciality { get; set; }
+        public int[] MedicalSpecialities{ get; set; }
     }
 }

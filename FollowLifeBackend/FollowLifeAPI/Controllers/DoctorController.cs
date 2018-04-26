@@ -305,14 +305,14 @@ namespace FollowLifeAPI.Controllers
                     context.DoctorMedicalSpeciality.RemoveRange(doctor.DoctorMedicalSpeciality);
                     await context.SaveChangesAsync();
 
-                    if (model.DoctorMedicalSpeciality.Length > 0)
+                    if (model.MedicalSpecialities.Length > 0)
                     {
-                        foreach (var dms in model.DoctorMedicalSpeciality)
+                        foreach (var ms in model.MedicalSpecialities)
                         {
                             context.DoctorMedicalSpeciality.Add(new DoctorMedicalSpeciality
                             {
                                 DoctorId = doctor.Id,
-                                MedicalSpecialityId = dms
+                                MedicalSpecialityId = ms
                             });
                         }
 
