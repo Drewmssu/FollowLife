@@ -40,8 +40,8 @@ namespace FollowLifeDataLayer
         public virtual ICollection<Device> Device { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Doctor> Doctor { get; set; }
+        public virtual Role Role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Patient> Patient { get; set; }
-        public virtual Role Role { get; set; }
     }
 }

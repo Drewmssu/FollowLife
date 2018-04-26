@@ -20,6 +20,7 @@ namespace FollowLifeDataLayer
             this.Appointment = new HashSet<Appointment>();
             this.DoctorMedicalSpeciality = new HashSet<DoctorMedicalSpeciality>();
             this.Membership = new HashSet<Membership>();
+            this.Patient = new HashSet<Patient>();
         }
     
         public int Id { get; set; }
@@ -39,5 +40,7 @@ namespace FollowLifeDataLayer
         public virtual ICollection<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Membership> Membership { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Patient> Patient { get; set; }
     }
 }

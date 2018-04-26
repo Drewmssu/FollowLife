@@ -21,7 +21,6 @@
         <EntityTypeShape EntityType="TestModel.MedicalSpeciality" Width="1.5" PointX="8.25" PointY="0.75" />
         <EntityTypeShape EntityType="TestModel.Membership" Width="1.5" PointX="13.5" PointY="10.125" />
         <EntityTypeShape EntityType="TestModel.Notification" Width="1.5" PointX="12.75" PointY="5.125" />
-        <EntityTypeShape EntityType="TestModel.Patient" Width="1.5" PointX="5.25" PointY="9.625" />
         <EntityTypeShape EntityType="TestModel.Plan" Width="1.5" PointX="3" PointY="5.5" />
         <EntityTypeShape EntityType="TestModel.Prescription" Width="1.5" PointX="12.75" PointY="14.5" />
         <EntityTypeShape EntityType="TestModel.Role" Width="1.5" PointX="0.75" PointY="10.75" />
@@ -30,7 +29,6 @@
         <AssociationConnector Association="TestModel.FK_Address_District" />
         <AssociationConnector Association="TestModel.FK_Doctor_Address" />
         <AssociationConnector Association="TestModel.FK_Appointment_Doctor" />
-        <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
         <AssociationConnector Association="TestModel.FK_Prescription_Appointment" />
         <AssociationConnector Association="TestModel.FK_Device_User" />
         <AssociationConnector Association="TestModel.FK_Doctor_User" />
@@ -38,16 +36,19 @@
         <AssociationConnector Association="TestModel.FK_Membership_Doctor" />
         <AssociationConnector Association="TestModel.FK_DoctorMedicalSpeciality_MedicalSpeciality" />
         <AssociationConnector Association="TestModel.FK_Indicator_IndicatorType" />
-        <AssociationConnector Association="TestModel.FK_Indicator_Patient" />
         <AssociationConnector Association="TestModel.FK_IndicatorEntry_Indicator" />
         <AssociationConnector Association="TestModel.FK_IndicatorType_UnitOfMeasurement" />
         <AssociationConnector Association="TestModel.FK_Item_ItemType" />
         <AssociationConnector Association="TestModel.FK_Item_Prescription" />
+        <AssociationConnector Association="TestModel.FK_User_Role" />
+        <EntityTypeShape EntityType="TestModel.Patient" Width="1.5" PointX="15.5" PointY="4.375" />
+        <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
+        <AssociationConnector Association="TestModel.FK_Patient_Doctor" />
+        <AssociationConnector Association="TestModel.FK_Indicator_Patient" />
         <AssociationConnector Association="TestModel.FK_Membership_Patient" />
         <AssociationConnector Association="TestModel.FK_Patient_Package" />
         <AssociationConnector Association="TestModel.FK_Patient_User" />
-        <AssociationConnector Association="TestModel.FK_User_Role" />
-      </Diagram>
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>
