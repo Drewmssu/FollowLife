@@ -453,6 +453,7 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.FORBIDDEN);
 
                     //TODO: Validate if patient membership is active (up to date on his payments)
+                    //TODO: Returns indicator (IMPORTANT)
 
                     return Ok(new
                     {
@@ -485,6 +486,36 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("doctor/appointments")]
+        [Route("doctor/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> GetAppointments(int? appointmentId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
 
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var doctor = user.Doctor.FirstOrDefault();
+
+                if (appointmentId.HasValue)
+                {
+                    var appointment =
+                }
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }
