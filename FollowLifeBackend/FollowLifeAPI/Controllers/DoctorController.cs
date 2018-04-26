@@ -206,6 +206,10 @@ namespace FollowLifeAPI.Controllers
                     return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                 var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
                 var doctor = user?.Doctor.FirstOrDefault();
 
                 if (doctor != null)
@@ -250,6 +254,10 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
                     var doctor = user.Doctor.FirstOrDefault();
                     var address = doctor.Address;
 
@@ -358,6 +366,10 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
                     var doctor = user.Doctor.FirstOrDefault();
 
                     model.Email = model.Email.ToLower();
@@ -405,13 +417,12 @@ namespace FollowLifeAPI.Controllers
                 {
                     return new ErrorResult(ex.Message);
                 }
-                
-                    
-
             }
 
                 
         }
+
+
     }
 
 }

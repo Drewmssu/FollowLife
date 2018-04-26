@@ -288,6 +288,53 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("patient/membership")]
+        public async Task<IHttpActionResult> ActivateMembership(ActivateMembership model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (model is null)
+                        throw new ArgumentNullException();
 
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA);
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var patient = user.Patient.FirstOrDefault();
+                    var membership = await context.Membership.FirstOrDefaultAsync(x => x.ReferencedEmail == x.ReferencedEmail &&
+                                                                                       x.Token == model.Code &&
+                                                                                       x.Status == ConstantHelper.STATUS.ACTIVE);
+
+                    if (membership is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Membership not found");
+
+                    if (membership.ExpiresAt < DateTime.Now)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Your code has expired");
+
+
+
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
     }
 }
