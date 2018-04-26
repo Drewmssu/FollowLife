@@ -7,6 +7,6 @@ namespace FollowLifeAPI.Models.Doctor
 {
     public class UpdateAppointment
     {
-        public DateTime appointmentDate { get; set; }
+        public DateTime AppointmentDate { get; set; }
     }
 }

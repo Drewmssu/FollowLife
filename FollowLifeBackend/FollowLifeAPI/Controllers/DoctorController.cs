@@ -15,6 +15,7 @@ using FollowLifeAPI.Models.Doctor;
 using FollowLifeAPI.BE;
 using System.Transactions;
 using FollowLifeService.MailJet;
+using Microsoft.Ajax.Utilities;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -640,7 +641,7 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
                     appointment.UpdatedAt = DateTime.Now;
-                    appointment.AppointmentDate = model.appointmentDate;
+                    appointment.AppointmentDate = model.AppointmentDate;
 
                     await context.SaveChangesAsync();
                     transaction.Complete();
@@ -660,5 +661,62 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult(ex.Message);
             }
         }
+
+        [HttpDelete]
+        [Route("doctor/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> CancelAppointment(int appointmentId)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var doctor = user.Doctor.FirstOrDefault();
+
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    if (appointment.DoctorId != doctor.Id)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
+
+                    if (appointment.Status != ConstantHelper.STATUS.ACTIVE)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    appointment.UpdatedAt = DateTime.Now;
+                    appointment.CanceledAt = DateTime.Now;
+                    appointment.Status = ConstantHelper.STATUS.INACTIVE;
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment deleted succesfully");
+
+                    return Ok(result);
+                }
+
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+
+
     }
 }
