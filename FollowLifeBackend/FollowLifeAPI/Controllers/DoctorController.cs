@@ -444,30 +444,47 @@ namespace FollowLifeAPI.Controllers
 
                 if (patientId.HasValue)
                 {
-                    var patient = await context.Patient.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == patientId);
+                    var patient = await context.Patient.FirstOrDefaultAsync(x => x.Id == patientId);
 
                     if (patient is null)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Patient does not exist");
 
-                    var result = new
+                    if (patient.DoctorId != doctor.Id)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN);
+
+                    //TODO: Validate if patient membership is active (up to date on his payments)
+
+                    return Ok(new
                     {
+                        profileImage = patient.User.ProfilePicture,
                         name = patient.User.FirstName,
                         lastName = patient.User.LastName,
                         age = patient.Age,
-                        patient.
-                    };
+                        height = patient.Height,
+                        weight = patient.Weight,
+                        bloodType = patient.BloodType,
+                        sex = patient.Sex
+                    });
                 }
 
+                var result = doctor.Patient.Where(x => x.DoctorId == doctor.Id &&
+                                                       x.Status == ConstantHelper.STATUS.CONFIRMED)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        name = x.User.FirstName + x.User.LastName,
+                        profileImage = x.User.ProfilePicture
+                    }).ToList();
+
+                return Ok(result);
+
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
-                throw;
+                return new ErrorResult();
             }
         }
 
+
     }
-
 }
-
-
