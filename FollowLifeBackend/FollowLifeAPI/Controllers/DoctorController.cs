@@ -507,7 +507,24 @@ namespace FollowLifeAPI.Controllers
 
                 if (appointmentId.HasValue)
                 {
-                    var appointment =
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    if (appointment.Status is ConstantHelper.STATUS.INACTIVE)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "Appointment not available");
+
+                    if (appointment.DoctorId != doctor.Id)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED, "Current user is not part of this appointment");
+
+                    if (appointment.AppointmentDate < DateTime.Now)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment has expired");
+
+                    return Ok(new
+                    {
+                        appointment
+                    });
                 }
 
             }
