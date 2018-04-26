@@ -26,7 +26,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PatientId" Type="int" />
           <Property Name="DoctorId" Type="int" />
-          <Property Name="CratedAt" Type="datetime" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="AppointmentDate" Type="datetime" Nullable="false" />
           <Property Name="CanceledAt" Type="datetime" />
           <Property Name="Reason" Type="varchar" MaxLength="250" />
@@ -623,7 +623,6 @@
       <Schema Namespace="TestModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="FollowLifeEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Address" EntityType="TestModel.Address" />
-          <EntitySet Name="Appointment" EntityType="TestModel.Appointment" />
           <EntitySet Name="Device" EntityType="TestModel.Device" />
           <EntitySet Name="District" EntityType="TestModel.District" />
           <EntitySet Name="Doctor" EntityType="TestModel.Doctor" />
@@ -651,14 +650,6 @@
           <AssociationSet Name="FK_Doctor_Address" Association="TestModel.FK_Doctor_Address">
             <End Role="Address" EntitySet="Address" />
             <End Role="Doctor" EntitySet="Doctor" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Appointment_Doctor" Association="TestModel.FK_Appointment_Doctor">
-            <End Role="Doctor" EntitySet="Doctor" />
-            <End Role="Appointment" EntitySet="Appointment" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Appointment_Patient" Association="TestModel.FK_Appointment_Patient">
-            <End Role="Patient" EntitySet="Patient" />
-            <End Role="Appointment" EntitySet="Appointment" />
           </AssociationSet>
           <AssociationSet Name="FK_Device_User" Association="TestModel.FK_Device_User">
             <End Role="User" EntitySet="User" />
@@ -732,6 +723,15 @@
             <End Role="Role" EntitySet="Role" />
             <End Role="User" EntitySet="User" />
           </AssociationSet>
+          <EntitySet Name="Appointment" EntityType="TestModel.Appointment" />
+          <AssociationSet Name="FK_Appointment_Doctor" Association="TestModel.FK_Appointment_Doctor">
+            <End Role="Doctor" EntitySet="Doctor" />
+            <End Role="Appointment" EntitySet="Appointment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Appointment_Patient" Association="TestModel.FK_Appointment_Patient">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Appointment" EntitySet="Appointment" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Address">
           <Key>
@@ -748,21 +748,6 @@
           <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="District" Relationship="TestModel.FK_Address_District" FromRole="Address" ToRole="District" />
           <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Doctor_Address" FromRole="Address" ToRole="Doctor" />
-        </EntityType>
-        <EntityType Name="Appointment">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PatientId" Type="Int32" />
-          <Property Name="DoctorId" Type="Int32" />
-          <Property Name="CratedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="AppointmentDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CanceledAt" Type="DateTime" Precision="3" />
-          <Property Name="Reason" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
-          <NavigationProperty Name="Patient" Relationship="TestModel.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
         </EntityType>
         <EntityType Name="Device">
           <Key>
@@ -795,12 +780,12 @@
           <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
           <Property Name="AddressId" Type="Int32" />
           <NavigationProperty Name="Address" Relationship="TestModel.FK_Doctor_Address" FromRole="Doctor" ToRole="Address" />
-          <NavigationProperty Name="Appointment" Relationship="TestModel.FK_Appointment_Doctor" FromRole="Doctor" ToRole="Appointment" />
           <NavigationProperty Name="User" Relationship="TestModel.FK_Doctor_User" FromRole="Doctor" ToRole="User" />
           <NavigationProperty Name="DoctorMedicalSpeciality" Relationship="TestModel.FK_DoctorMedicalSpeciality_Doctor" FromRole="Doctor" ToRole="DoctorMedicalSpeciality" />
           <NavigationProperty Name="Membership" Relationship="TestModel.FK_Membership_Doctor" FromRole="Doctor" ToRole="Membership" />
           <NavigationProperty Name="Patient" Relationship="TestModel.FK_Patient_Doctor" FromRole="Doctor" ToRole="Patient" />
           <NavigationProperty Name="Prescription" Relationship="TestModel.FK_Prescription_Doctor" FromRole="Doctor" ToRole="Prescription" />
+          <NavigationProperty Name="Appointment" Relationship="TestModel.FK_Appointment_Doctor" FromRole="Doctor" ToRole="Appointment" />
         </EntityType>
         <EntityType Name="DoctorMedicalSpeciality">
           <Key>
@@ -941,13 +926,13 @@
           <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="Height" Type="Decimal" Precision="2" Scale="1" />
           <Property Name="DoctorId" Type="Int32" />
-          <NavigationProperty Name="Appointment" Relationship="TestModel.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
           <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Patient_Doctor" FromRole="Patient" ToRole="Doctor" />
           <NavigationProperty Name="Indicator" Relationship="TestModel.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
           <NavigationProperty Name="Membership" Relationship="TestModel.FK_Membership_Patient" FromRole="Patient" ToRole="Membership" />
           <NavigationProperty Name="Plan" Relationship="TestModel.FK_Patient_Package" FromRole="Patient" ToRole="Plan" />
           <NavigationProperty Name="User" Relationship="TestModel.FK_Patient_User" FromRole="Patient" ToRole="User" />
           <NavigationProperty Name="Prescription" Relationship="TestModel.FK_Prescription_Patient" FromRole="Patient" ToRole="Prescription" />
+          <NavigationProperty Name="Appointment" Relationship="TestModel.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
         </EntityType>
         <EntityType Name="Plan">
           <Key>
@@ -1034,30 +1019,6 @@
             </Principal>
             <Dependent Role="Doctor">
               <PropertyRef Name="AddressId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Appointment_Doctor">
-          <End Type="TestModel.Doctor" Role="Doctor" Multiplicity="0..1" />
-          <End Type="TestModel.Appointment" Role="Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Doctor">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="DoctorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Appointment_Patient">
-          <End Type="TestModel.Patient" Role="Patient" Multiplicity="0..1" />
-          <End Type="TestModel.Appointment" Role="Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Patient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="PatientId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1277,6 +1238,45 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Appointment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" />
+          <Property Name="DoctorId" Type="Int32" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="AppointmentDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CanceledAt" Type="DateTime" Precision="3" />
+          <Property Name="Reason" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="TestModel.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
+        </EntityType>
+        <Association Name="FK_Appointment_Doctor">
+          <End Type="TestModel.Doctor" Role="Doctor" Multiplicity="0..1" />
+          <End Type="TestModel.Appointment" Role="Appointment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Appointment">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Appointment_Patient">
+          <End Type="TestModel.Patient" Role="Patient" Multiplicity="0..1" />
+          <End Type="TestModel.Appointment" Role="Appointment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Appointment">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1294,20 +1294,6 @@
                 <ScalarProperty Name="Neighborhood" ColumnName="Neighborhood" />
                 <ScalarProperty Name="Street" ColumnName="Street" />
                 <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Appointment">
-            <EntityTypeMapping TypeName="TestModel.Appointment">
-              <MappingFragment StoreEntitySet="Appointment">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Reason" ColumnName="Reason" />
-                <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />
-                <ScalarProperty Name="AppointmentDate" ColumnName="AppointmentDate" />
-                <ScalarProperty Name="CratedAt" ColumnName="CratedAt" />
-                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1537,6 +1523,20 @@
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Appointment">
+            <EntityTypeMapping TypeName="TestModel.Appointment">
+              <MappingFragment StoreEntitySet="Appointment">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />
+                <ScalarProperty Name="AppointmentDate" ColumnName="AppointmentDate" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

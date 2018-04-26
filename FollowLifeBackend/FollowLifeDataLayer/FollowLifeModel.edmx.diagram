@@ -6,7 +6,6 @@
     <edmx:Diagrams>
       <Diagram DiagramId="9fffa97f8a6540aa998c224356cdc8a1" Name="Diagram1">
         <EntityTypeShape EntityType="TestModel.Address" Width="1.5" PointX="3" PointY="5" />
-        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="9.75" PointY="10.125" />
         <EntityTypeShape EntityType="TestModel.Device" Width="1.5" PointX="5.25" PointY="15.25" />
         <EntityTypeShape EntityType="TestModel.District" Width="1.5" PointX="0.75" PointY="5.75" />
         <EntityTypeShape EntityType="TestModel.Doctor" Width="1.5" PointX="5.25" PointY="9.625" />
@@ -29,8 +28,6 @@
         <EntityTypeShape EntityType="TestModel.User" Width="1.5" PointX="3" PointY="9.375" />
         <AssociationConnector Association="TestModel.FK_Address_District" />
         <AssociationConnector Association="TestModel.FK_Doctor_Address" />
-        <AssociationConnector Association="TestModel.FK_Appointment_Doctor" />
-        <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
         <AssociationConnector Association="TestModel.FK_Device_User" />
         <AssociationConnector Association="TestModel.FK_Doctor_User" />
         <AssociationConnector Association="TestModel.FK_DoctorMedicalSpeciality_Doctor" />
@@ -49,6 +46,9 @@
         <AssociationConnector Association="TestModel.FK_Patient_User" />
         <AssociationConnector Association="TestModel.FK_Prescription_Patient" />
         <AssociationConnector Association="TestModel.FK_User_Role" />
+        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="9.75" PointY="10.125" />
+        <AssociationConnector Association="TestModel.FK_Appointment_Doctor" />
+        <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

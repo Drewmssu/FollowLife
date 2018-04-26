@@ -17,10 +17,10 @@ namespace FollowLifeDataLayer
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Patient()
         {
-            this.Appointment = new HashSet<Appointment>();
             this.Indicator = new HashSet<Indicator>();
             this.Membership = new HashSet<Membership>();
             this.Prescription = new HashSet<Prescription>();
+            this.Appointment = new HashSet<Appointment>();
         }
     
         public int Id { get; set; }
@@ -36,8 +36,6 @@ namespace FollowLifeDataLayer
         public Nullable<decimal> Height { get; set; }
         public Nullable<int> DoctorId { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Appointment> Appointment { get; set; }
         public virtual Doctor Doctor { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Indicator> Indicator { get; set; }
@@ -47,5 +45,7 @@ namespace FollowLifeDataLayer
         public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Prescription> Prescription { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Appointment> Appointment { get; set; }
     }
 }

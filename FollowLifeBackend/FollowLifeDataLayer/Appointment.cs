@@ -17,7 +17,7 @@ namespace FollowLifeDataLayer
         public int Id { get; set; }
         public Nullable<int> PatientId { get; set; }
         public Nullable<int> DoctorId { get; set; }
-        public System.DateTime CratedAt { get; set; }
+        public System.DateTime CreatedAt { get; set; }
         public System.DateTime AppointmentDate { get; set; }
         public Nullable<System.DateTime> CanceledAt { get; set; }
         public string Reason { get; set; }
