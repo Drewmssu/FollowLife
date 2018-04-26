@@ -582,6 +582,7 @@ namespace FollowLifeAPI.Controllers
                         DoctorId = doctor.Id,
                         PatientId = model.PatientId,
                         CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
                         AppointmentDate = model.AppointmentDate,
                         Reason = model.Reason,
                         Status = ConstantHelper.STATUS.ACTIVE
@@ -590,6 +591,7 @@ namespace FollowLifeAPI.Controllers
                     context.Appointment.Add(appointment);
 
                     await context.SaveChangesAsync();
+                    transaction.Complete();
 
                     var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment added succesfully");
 
@@ -608,7 +610,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPut]
         [Route("doctor/appointments/{appointmentId}")]
-        public async Task<IHttpActionResult> UpdateAppointment(int appointmentId)
+        public async Task<IHttpActionResult> UpdateAppointment(int appointmentId, [FromBody]UpdateAppointment model)
         {
             try
             {
@@ -628,8 +630,24 @@ namespace FollowLifeAPI.Controllers
 
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
+                    if (appointment.DoctorId != doctor.Id)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
 
+                    if (appointment.Status != ConstantHelper.STATUS.ACTIVE)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    appointment.UpdatedAt = DateTime.Now;
+                    appointment.AppointmentDate = model.appointmentDate;
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment updated succesfully");
+
+                    return Ok(result);
                 }
 
             }
