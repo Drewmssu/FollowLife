@@ -201,7 +201,11 @@ namespace FollowLifeAPI.Controllers
                     return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                 var user = await context.User.FindAsync(userId);
-                var patient = user?.Patient.FirstOrDefault();
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var patient = user.Patient.FirstOrDefault();
 
                 if (patient != null)
                     return Ok(new
@@ -326,6 +330,7 @@ namespace FollowLifeAPI.Controllers
                     membership.Status = ConstantHelper.STATUS.CONFIRMED;
 
                     await context.SaveChangesAsync();
+                    transaction.Complete();
 
                     return Ok(new ErrorResult(ErrorHelper.STATUS_OK));
                 }

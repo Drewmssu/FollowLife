@@ -26,7 +26,7 @@ namespace FollowLifeAPI.BE
 
         public MedicalSpecialityBE[] Fill(IEnumerable<MedicalSpeciality> mes)
         {
-            if (mes.Count() == 0)
+            if (!mes.Any())
                 return null;
 
             var result = new List<MedicalSpecialityBE>();

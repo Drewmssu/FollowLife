@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using System.Data.Entity;
+using System.Runtime.InteropServices.ComTypes;
 using FollowLifeLogic;
 using FollowLifeDataLayer;
 using FollowLifeAPI.Models.Doctor;
@@ -223,7 +224,7 @@ namespace FollowLifeAPI.Controllers
                         medicIdentification = doctor.MedicIdentification,
                         address = new AddressBE().Fill(doctor.Address),
                         medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
-                        numberOfPatients = doctor.Membership.Where(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED).Count()
+                        numberOfPatients = doctor.Membership.Count(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED)
                     });
 
                 throw new Exception();
@@ -422,6 +423,48 @@ namespace FollowLifeAPI.Controllers
                 
         }
 
+        [HttpGet]
+        [Route("doctor/patients")]
+        [Route("doctor/patients/{patientId}")]
+        public async Task<IHttpActionResult> GetPatients(int? patientId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+                
+                if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var doctor = user.Doctor.FirstOrDefault();
+
+                if (patientId.HasValue)
+                {
+                    var patient = await context.Patient.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == patientId);
+
+                    if (patient is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Patient does not exist");
+
+                    var result = new
+                    {
+                        name = patient.User.FirstName,
+                        lastName = patient.User.LastName,
+                        age = patient.Age,
+                        patient.
+                    };
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
     }
 
