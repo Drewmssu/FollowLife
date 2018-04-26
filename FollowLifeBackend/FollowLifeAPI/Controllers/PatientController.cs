@@ -245,6 +245,10 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
                     var patient = user.Patient.FirstOrDefault();
 
                     user.PhoneNumber = model.PhoneNumber;

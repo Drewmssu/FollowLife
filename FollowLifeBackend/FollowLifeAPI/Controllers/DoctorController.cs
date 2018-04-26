@@ -401,11 +401,8 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
 
                     transaction.Complete();
-
-                    var result = new
-                    {
-                        expirationDate = membership.ExpiresAt
-                    };
+                    
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Your code expires at: " + membership.ExpiresAt);
 
                     return Ok(result);
 
@@ -523,7 +520,7 @@ namespace FollowLifeAPI.Controllers
 
                     return Ok(new
                     {
-                        createdAt = appointment.CratedAt,
+                        createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
                         patient = new PatientBE().Fill(appointment.Patient)
@@ -548,6 +545,101 @@ namespace FollowLifeAPI.Controllers
             catch
             {
                 return new ErrorResult();
+            }
+        }
+
+        [HttpPost]
+        [Route("doctor/appointments")]
+        public async Task<IHttpActionResult> AddAppointment(AddAppointment model) 
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    if (model.AppointmentDate < DateTime.Now)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Date can't be before than today");
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var doctor = user.Doctor.FirstOrDefault();
+
+                    var appointment = new Appointment
+                    {
+                        DoctorId = doctor.Id,
+                        PatientId = model.PatientId,
+                        CreatedAt = DateTime.Now,
+                        AppointmentDate = model.AppointmentDate,
+                        Reason = model.Reason,
+                        Status = ConstantHelper.STATUS.ACTIVE
+                    };
+
+                    context.Appointment.Add(appointment);
+
+                    await context.SaveChangesAsync();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment added succesfully");
+
+                    return Ok(result);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("doctor/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> UpdateAppointment(int appointmentId)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var doctor = user.Doctor.FirstOrDefault();
+
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+
+
+                }
+
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
             }
         }
     }
