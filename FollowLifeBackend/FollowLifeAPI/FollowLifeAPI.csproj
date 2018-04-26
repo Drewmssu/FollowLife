@@ -199,11 +199,11 @@
     <Compile Include="Helpers\Convert.cs" />
     <Compile Include="Helpers\ErrorHelper.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
-    <Compile Include="Models\Doctor\AddAppointment.cs" />
+    <Compile Include="Models\Appointment\AddAppointment.cs" />
     <Compile Include="Models\Doctor\GenerateMembership.cs" />
     <Compile Include="Models\Doctor\Profile.cs" />
     <Compile Include="Models\Doctor\Register.cs" />
-    <Compile Include="Models\Doctor\UpdateAppointment.cs" />
+    <Compile Include="Models\Appointment\UpdateAppointment.cs" />
     <Compile Include="Models\Patient\ActivateMembership.cs" />
     <Compile Include="Models\Repository\Element.cs" />
     <Compile Include="Models\Error.cs" />

@@ -11,6 +11,7 @@ using System.Transactions;
 using System.Web;
 using System.Web.Http;
 using FollowLifeAPI.BE;
+using FollowLifeAPI.Models.Appointment;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -376,7 +377,7 @@ namespace FollowLifeAPI.Controllers
                     if (appointment is null)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
-                    if (appointment.Status is ConstantHelper.STATUS.INACTIVE)
+                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED)
                         return new ErrorResult(ErrorHelper.FORBIDDEN, "Appointment not available");
 
                     if (appointment.PatientId != patient.Id)
@@ -396,7 +397,7 @@ namespace FollowLifeAPI.Controllers
 
                 var today = DateTime.Now;
                 var result = context.Appointment.Where(x => x.PatientId == patient.Id &&
-                                                            x.Status == ConstantHelper.STATUS.ACTIVE &&
+                                                            x.Status == ConstantHelper.STATUS.CONFIRMED &&
                                                             x.AppointmentDate >= today)
                     .Select(x => new
                     {
@@ -414,6 +415,185 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult();
             }
         }
+
+        [HttpPost]
+        [Route("patient/appointments")]
+        public async Task<IHttpActionResult> RequestAppointment(AddAppointment model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    #region Validation
+
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    if (model.AppointmentDate < DateTime.Now)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Date can't be before than today");
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    #endregion
+
+                    var patient = user.Patient.FirstOrDefault();
+
+                    var appointment = new Appointment
+                    {
+                        DoctorId = model.DoctorId,
+                        PatientId = patient.Id,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        AppointmentDate = model.AppointmentDate,
+                        Reason = model.Reason,
+                        Status = ConstantHelper.STATUS.REQUESTED
+                    };
+
+                    if (appointment.DoctorId is null)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Missing doctorId");
+
+                    context.Appointment.Add(appointment);
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment added succesfully");
+
+                    return Ok(result);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("patient/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> UpdateAppointment(int appointmentId, [FromBody]UpdateAppointment model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var patient = user.Patient.FirstOrDefault();
+
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    if (appointment.PatientId != patient.Id)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
+
+                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
+                        appointment.Status != ConstantHelper.STATUS.REQUESTED)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    appointment.UpdatedAt = DateTime.Now;
+                    appointment.AppointmentDate = model.AppointmentDate;
+                    appointment.Status = ConstantHelper.STATUS.REQUESTED;
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment updated succesfully");
+
+                    return Ok(result);
+                }
+
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("patient/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> CancelAppointment(int appointmentId)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var patient = user.Patient.FirstOrDefault();
+
+                    var appointment = await context.Appointment.FindAsync(appointmentId);
+
+                    if (appointment is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    if (appointment.PatientId != patient.Id)
+                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
+
+                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
+                        appointment.Status != ConstantHelper.STATUS.REQUESTED)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                    appointment.UpdatedAt = DateTime.Now;
+                    appointment.CanceledAt = DateTime.Now;
+                    appointment.Status = ConstantHelper.STATUS.INACTIVE;
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment deleted succesfully");
+
+                    return Ok(result);
+                }
+
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+
 
     }
 }

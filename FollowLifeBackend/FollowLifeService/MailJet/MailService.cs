@@ -51,14 +51,7 @@ namespace FollowLifeService.MailJet
 
             var response = await client.PostAsync(request);
 
-            if (response.IsSuccessStatusCode)
-            {
-                return "success";
-            }
-            else
-            {
-                return "error";
-            }
+            return response.IsSuccessStatusCode ? "success" : "error";
         }
     }
 }

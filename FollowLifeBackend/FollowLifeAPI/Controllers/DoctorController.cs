@@ -14,6 +14,7 @@ using FollowLifeDataLayer;
 using FollowLifeAPI.Models.Doctor;
 using FollowLifeAPI.BE;
 using System.Transactions;
+using FollowLifeAPI.Models.Appointment;
 using FollowLifeService.MailJet;
 using Microsoft.Ajax.Utilities;
 
@@ -510,7 +511,7 @@ namespace FollowLifeAPI.Controllers
                     if (appointment is null)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
-                    if (appointment.Status is ConstantHelper.STATUS.INACTIVE)
+                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED)
                         return new ErrorResult(ErrorHelper.FORBIDDEN, "Appointment not available");
 
                     if (appointment.DoctorId != doctor.Id)
@@ -530,7 +531,7 @@ namespace FollowLifeAPI.Controllers
 
                 var today = DateTime.Now;
                 var result = context.Appointment.Where(x => x.DoctorId == doctor.Id &&
-                                                            x.Status == ConstantHelper.STATUS.ACTIVE &&
+                                                            x.Status == ConstantHelper.STATUS.CONFIRMED &&
                                                             x.AppointmentDate >= today)
                     .Select(x => new
                     {
@@ -557,6 +558,8 @@ namespace FollowLifeAPI.Controllers
             {
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+                    #region Validation
+
                     if (model is null)
                         throw new ArgumentNullException();
 
@@ -576,6 +579,8 @@ namespace FollowLifeAPI.Controllers
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
+                    #endregion
+
                     var doctor = user.Doctor.FirstOrDefault();
 
                     var appointment = new Appointment
@@ -586,8 +591,11 @@ namespace FollowLifeAPI.Controllers
                         UpdatedAt = DateTime.Now,
                         AppointmentDate = model.AppointmentDate,
                         Reason = model.Reason,
-                        Status = ConstantHelper.STATUS.ACTIVE
+                        Status = ConstantHelper.STATUS.CONFIRMED
                     };
+
+                    if (appointment.PatientId is null)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Missing patientId");
 
                     context.Appointment.Add(appointment);
 
@@ -690,7 +698,8 @@ namespace FollowLifeAPI.Controllers
                     if (appointment.DoctorId != doctor.Id)
                         return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
 
-                    if (appointment.Status != ConstantHelper.STATUS.ACTIVE)
+                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
+                        appointment.Status != ConstantHelper.STATUS.REQUESTED)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
                     appointment.UpdatedAt = DateTime.Now;

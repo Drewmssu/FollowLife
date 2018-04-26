@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace FollowLifeAPI.Models.Doctor
+namespace FollowLifeAPI.Models.Appointment
 {
     public class UpdateAppointment
     {
