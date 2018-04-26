@@ -4,7 +4,6 @@ using FollowLifeAPI.Models.Patient;
 using FollowLifeDataLayer;
 using FollowLifeLogic;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -288,7 +287,7 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("patient/membership")]
         public async Task<IHttpActionResult> ActivateMembership(ActivateMembership model)
         {
@@ -313,7 +312,7 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var patient = user.Patient.FirstOrDefault();
-                    var membership = await context.Membership.FirstOrDefaultAsync(x => x.ReferencedEmail == x.ReferencedEmail &&
+                    var membership = await context.Membership.FirstOrDefaultAsync(x => x.ReferencedEmail == user.Email &&
                                                                                        x.Token == model.Code &&
                                                                                        x.Status == ConstantHelper.STATUS.ACTIVE);
 
@@ -323,8 +322,12 @@ namespace FollowLifeAPI.Controllers
                     if (membership.ExpiresAt < DateTime.Now)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Your code has expired");
 
+                    membership.PatientId = patient.Id;
+                    membership.Status = ConstantHelper.STATUS.CONFIRMED;
 
+                    await context.SaveChangesAsync();
 
+                    return Ok(new ErrorResult(ErrorHelper.STATUS_OK));
                 }
             }
             catch (ArgumentNullException)
