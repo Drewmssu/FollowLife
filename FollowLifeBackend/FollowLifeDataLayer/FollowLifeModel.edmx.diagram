@@ -46,7 +46,7 @@
         <AssociationConnector Association="TestModel.FK_Patient_User" />
         <AssociationConnector Association="TestModel.FK_Prescription_Patient" />
         <AssociationConnector Association="TestModel.FK_User_Role" />
-        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="9.75" PointY="10.125" />
+        <EntityTypeShape EntityType="TestModel.Appointment" Width="1.5" PointX="9.75" PointY="10" />
         <AssociationConnector Association="TestModel.FK_Appointment_Doctor" />
         <AssociationConnector Association="TestModel.FK_Appointment_Patient" />
       </Diagram>

@@ -31,6 +31,7 @@
           <Property Name="CanceledAt" Type="datetime" />
           <Property Name="Reason" Type="varchar" MaxLength="250" />
           <Property Name="Status" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" />
         </EntityType>
         <EntityType Name="Device">
           <Key>
@@ -732,7 +733,7 @@
             <End Role="Patient" EntitySet="Patient" />
             <End Role="Appointment" EntitySet="Appointment" />
           </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="Address">
           <Key>
             <PropertyRef Name="Id" />
@@ -1250,6 +1251,7 @@
           <Property Name="CanceledAt" Type="DateTime" Precision="3" />
           <Property Name="Reason" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
           <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Doctor" Relationship="TestModel.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
           <NavigationProperty Name="Patient" Relationship="TestModel.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
         </EntityType>
@@ -1530,6 +1532,7 @@
           <EntitySetMapping Name="Appointment">
             <EntityTypeMapping TypeName="TestModel.Appointment">
               <MappingFragment StoreEntitySet="Appointment">
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Reason" ColumnName="Reason" />
                 <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />

@@ -22,6 +22,7 @@ namespace FollowLifeDataLayer
         public Nullable<System.DateTime> CanceledAt { get; set; }
         public string Reason { get; set; }
         public string Status { get; set; }
+        public Nullable<System.DateTime> UpdatedAt { get; set; }
     
         public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }
