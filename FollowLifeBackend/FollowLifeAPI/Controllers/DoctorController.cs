@@ -523,15 +523,31 @@ namespace FollowLifeAPI.Controllers
 
                     return Ok(new
                     {
-                        appointment
+                        createdAt = appointment.CratedAt,
+                        appointmentDate = appointment.AppointmentDate,
+                        reason = appointment.Reason,
+                        patient = new PatientBE().Fill(appointment.Patient)
                     });
                 }
 
-            }
-            catch (Exception)
-            {
+                var today = DateTime.Now;
+                var result = context.Appointment.Where(x => x.DoctorId == doctor.Id &&
+                                                            x.Status == ConstantHelper.STATUS.ACTIVE &&
+                                                            x.AppointmentDate >= today)
+                    .Select(x => new
+                    {
+                        id = x.Id,
+                        date = x.AppointmentDate,
+                        reason = x.Reason,
+                        patient = new PatientBE().Fill(x.Patient)
+                    });
 
-                throw;
+                return Ok(result);
+
+            }
+            catch
+            {
+                return new ErrorResult();
             }
         }
     }

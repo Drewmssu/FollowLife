@@ -21,17 +21,18 @@ namespace FollowLifeAPI.Controllers
             {
                 var element = await context.MedicalSpeciality.FindAsync(medicalSpecialityId);
 
-                return Ok(new Element
-                {
-                    Code = element.Id,
-                    Text = element.Name
-                });
+                if (element != null)
+                    return Ok(new Element
+                    {
+                        Code = element.Id,
+                        Text = element.Name
+                    });
             }
 
             var result = new ConcurrentBag<Element>();
             var collection = await context.MedicalSpeciality.ToListAsync();
 
-            Parallel.ForEach(collection, (element) =>
+            Parallel.ForEach(collection, element =>
             {
                 result.Add(new Element
                 {
