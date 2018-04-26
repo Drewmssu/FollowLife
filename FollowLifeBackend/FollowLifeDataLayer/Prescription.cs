@@ -24,10 +24,10 @@ namespace FollowLifeDataLayer
         public int DoctorId { get; set; }
         public int PatientId { get; set; }
         public System.DateTime CreatedAt { get; set; }
-        public Nullable<int> AppointmentId { get; set; }
     
-        public virtual Appointment Appointment { get; set; }
+        public virtual Doctor Doctor { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Item> Item { get; set; }
+        public virtual Patient Patient { get; set; }
     }
 }

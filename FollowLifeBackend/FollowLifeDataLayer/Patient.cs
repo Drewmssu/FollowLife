@@ -20,6 +20,7 @@ namespace FollowLifeDataLayer
             this.Appointment = new HashSet<Appointment>();
             this.Indicator = new HashSet<Indicator>();
             this.Membership = new HashSet<Membership>();
+            this.Prescription = new HashSet<Prescription>();
         }
     
         public int Id { get; set; }
@@ -44,5 +45,7 @@ namespace FollowLifeDataLayer
         public virtual ICollection<Membership> Membership { get; set; }
         public virtual Plan Plan { get; set; }
         public virtual User User { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Prescription> Prescription { get; set; }
     }
 }
