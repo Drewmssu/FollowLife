@@ -352,6 +352,65 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("patient/doctors")]
+        [Route("patient/doctors/{doctorId}")]
+        public async Task<IHttpActionResult> GetDoctors(int? doctorId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
+                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                var patient = user.Patient.FirstOrDefault();
+
+                if (doctorId.HasValue)
+                {
+                    var doctor = context.Membership.FirstOrDefault(x => x.DoctorId == doctorId &&
+                                                                         x.PatientId == patient.Id &&
+                                                                         x.Status == ConstantHelper.STATUS.CONFIRMED)?.Doctor;
+
+                    if (doctor is null)
+                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Doctor does not exist");
+
+                    //TODO: Validate if doctor membership is active (up to date on his payments)
+                    //TODO: Returns indicator (IMPORTANT)
+
+                    return Ok(new
+                    {
+                        profileImage = ImageHelper.GetImageURL(doctor.User.ProfilePicture),
+                        name = doctor.User.FirstName,
+                        lastName = doctor.User.LastName,
+                        medicIndentification = doctor.MedicIdentification,
+                        address = new AddressBE().Fill(doctor.Address),
+                        medicalSpecialities = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality))
+                    });
+                }
+
+                var result = patient.Membership.Where(x => x.PatientId == patient.Id &&
+                                                           x.Status == ConstantHelper.STATUS.CONFIRMED)
+                    .Select(x => new
+                    {
+                        id = x.DoctorId,
+                        name = x.Doctor.User.FirstName + x.Doctor.User.LastName,
+                        profileImage = ImageHelper.GetImageURL(x.Doctor.User.ProfilePicture)
+                    }).ToList();
+
+                return Ok(result);
+            }
+            catch
+            {
+                return new ErrorResult();
+            }
+        }
+
+        [HttpGet]
         [Route("patient/appointments")]
         [Route("patient/appointments/{appointmentId}")]
         public async Task<IHttpActionResult> GetAppointments(int? appointmentId = null)
