@@ -442,13 +442,12 @@ namespace FollowLifeAPI.Controllers
 
                 if (patientId.HasValue)
                 {
-                    var patient = await context.Patient.FirstOrDefaultAsync(x => x.Id == patientId);
+                    var patient = context.Membership.FirstOrDefault(x => x.PatientId == patientId &&
+                                                                         x.DoctorId == doctor.Id  &&
+                                                                         x.Status == ConstantHelper.STATUS.CONFIRMED)?.Patient;
 
                     if (patient is null)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Patient does not exist");
-
-                    if (patient.DoctorId != doctor.Id)
-                        return new ErrorResult(ErrorHelper.FORBIDDEN);
 
                     //TODO: Validate if patient membership is active (up to date on his payments)
                     //TODO: Returns indicator (IMPORTANT)
@@ -466,17 +465,16 @@ namespace FollowLifeAPI.Controllers
                     });
                 }
 
-                var result = doctor.Patient.Where(x => x.DoctorId == doctor.Id &&
-                                                       x.Status == ConstantHelper.STATUS.CONFIRMED)
+                var result = doctor.Membership.Where(x => x.DoctorId == doctor.Id &&
+                                                          x.Status == ConstantHelper.STATUS.CONFIRMED)
                     .Select(x => new
                     {
-                        id = x.Id,
-                        name = x.User.FirstName + x.User.LastName,
-                        profileImage = x.User.ProfilePicture
+                        id = x.PatientId,
+                        name = x.Patient.User.FirstName + x.Patient.User.LastName,
+                        profileImage = ImageHelper.GetImageURL(x.Patient.User.ProfilePicture)
                     }).ToList();
 
                 return Ok(result);
-
             }
             catch
             {
