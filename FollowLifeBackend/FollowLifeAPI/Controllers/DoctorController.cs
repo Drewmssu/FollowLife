@@ -455,7 +455,7 @@ namespace FollowLifeAPI.Controllers
 
                     return Ok(new
                     {
-                        profileImage = patient.User.ProfilePicture,
+                        profileImage = ImageHelper.GetImageURL(patient.User.ProfilePicture),
                         name = patient.User.FirstName,
                         lastName = patient.User.LastName,
                         age = patient.Age,
