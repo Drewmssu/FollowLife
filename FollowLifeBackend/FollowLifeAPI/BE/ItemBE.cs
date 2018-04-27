@@ -8,6 +8,5 @@ namespace FollowLifeAPI.BE
     public class ItemBE
     {
         public int ItemId { get; set; }
-        public int 
     }
 }

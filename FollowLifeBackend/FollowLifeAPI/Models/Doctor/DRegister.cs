@@ -6,7 +6,7 @@ using System.Web;
 
 namespace FollowLifeAPI.Models.Doctor
 {
-    public class Register
+    public class DRegister
     {
         public int? DoctorId { get; set; }
         [Required(AllowEmptyStrings = false)]

@@ -133,7 +133,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("patient/register")]
-        public async Task<IHttpActionResult> Register(Register model)
+        public async Task<IHttpActionResult> Register(PRegister model)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPut]
         [Route("patient/profile")]
-        public async Task<IHttpActionResult> Profile(Profile model)
+        public async Task<IHttpActionResult> Profile(PProfile model)
         {
             try
             {

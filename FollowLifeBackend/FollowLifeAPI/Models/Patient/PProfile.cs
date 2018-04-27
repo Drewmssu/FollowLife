@@ -5,7 +5,7 @@ using System.Web;
 
 namespace FollowLifeAPI.Models.Patient
 {
-    public class Profile
+    public class PProfile
     {
         public HttpPostedFileBase ProfileImage { get; set; }
         [MinLength(9)]
