@@ -17,7 +17,5 @@ namespace FollowLifeAPI.Models
 
         [Required(AllowEmptyStrings = false)]
         public string DeviceToken { get; set; }
-
-        public int UserId { get; set; }
     }
 }

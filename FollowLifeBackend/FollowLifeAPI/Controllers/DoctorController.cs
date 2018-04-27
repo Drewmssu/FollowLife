@@ -45,7 +45,7 @@ namespace FollowLifeAPI.Controllers
                 if (user.Status == ConstantHelper.STATUS.INACTIVE)
                     return new ErrorResult(ErrorHelper.NOT_FOUND, "Usuario Eliminado");
 
-                if (user.Status != ConstantHelper.STATUS.CONFIRMED ||
+                if (user.Status != ConstantHelper.STATUS.CONFIRMED &&
                     user.Status != ConstantHelper.STATUS.ACTIVE)
                     return new ErrorResult(ErrorHelper.NOT_FOUND, "User not found");
 
@@ -127,7 +127,13 @@ namespace FollowLifeAPI.Controllers
 
                 await context.SaveChangesAsync();
 
-                return Ok();
+                var result = new
+                {
+                    Code = HttpStatusCode.OK,
+                    Message = "Success"
+                };
+
+                return Ok(result);
             }
             catch
             {
@@ -158,7 +164,7 @@ namespace FollowLifeAPI.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Email,
-                    Password = model.Password,
+                    Password = CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password),
                     RoleId = ConstantHelper.ROLE.ID.DOCTOR,
                     Status = ConstantHelper.STATUS.ACTIVE,
                     CreatedAt = DateTime.Now,
@@ -179,11 +185,13 @@ namespace FollowLifeAPI.Controllers
                 context.Doctor.Add(doctor);
                 await context.SaveChangesAsync();
 
-                return Ok(HttpStatusCode.Created);
+                var result = new
+                {
+                    code = HttpStatusCode.Created,
+                    message = "Success"
+                };
 
-                //model.Password = "### HIDDEN ###";
-
-                //return Ok(model);
+                return Ok(result);
             }
             catch (ArgumentNullException)
             {
