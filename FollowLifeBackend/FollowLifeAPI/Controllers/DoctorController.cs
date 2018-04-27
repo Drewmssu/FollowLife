@@ -1,14 +1,13 @@
 ﻿using FollowLifeAPI.Helpers;
 using FollowLifeAPI.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using System.Data.Entity;
-using System.Runtime.InteropServices.ComTypes;
+using System.Net;
 using FollowLifeLogic;
 using FollowLifeDataLayer;
 using FollowLifeAPI.Models.Doctor;
@@ -16,7 +15,6 @@ using FollowLifeAPI.BE;
 using System.Transactions;
 using FollowLifeAPI.Models.Appointment;
 using FollowLifeService.MailJet;
-using Microsoft.Ajax.Utilities;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -182,10 +180,11 @@ namespace FollowLifeAPI.Controllers
                 context.Doctor.Add(doctor);
                 await context.SaveChangesAsync();
 
-                model.DoctorId = doctor.Id;
-                model.Password = "### HIDDEN ###";
+                return Ok(HttpStatusCode.Created);
+                //model.DoctorId = doctor.Id;
+                //model.Password = "### HIDDEN ###";
 
-                return Ok(model);
+                //return Ok(model);
             }
             catch (ArgumentNullException)
             {
