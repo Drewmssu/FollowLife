@@ -43,5 +43,37 @@ namespace FollowLifeAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("repository/itemTypes")]
+        [Route("repository/itemTypes/{itemTypeId}")]
+        public async Task<IHttpActionResult> ItemTypes(int? itemTypeId = null)
+        {
+            if (itemTypeId.HasValue)
+            {
+                var element = await context.ItemType.FindAsync(itemTypeId);
+
+                if (element != null)
+                    return Ok(new Element
+                    {
+                        Code = element.Id,
+                        Text = element.Name
+                    });
+            }
+
+            var result = new ConcurrentBag<Element>();
+            var collection = await context.ItemType.ToListAsync();
+
+            Parallel.ForEach(collection, element =>
+            {
+                result.Add(new Element
+                {
+                    Code = element.Id,
+                    Text = element.Name
+                });
+            });
+
+            return Ok(result);
+        }
     }
 }
