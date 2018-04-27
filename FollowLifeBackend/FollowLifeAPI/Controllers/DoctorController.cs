@@ -137,7 +137,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("doctor/register")]
-        public async Task<IHttpActionResult> Register(DRegister model)
+        public async Task<IHttpActionResult> Register(Register model)
         {
             try
             {
@@ -162,8 +162,7 @@ namespace FollowLifeAPI.Controllers
                     RoleId = ConstantHelper.ROLE.ID.DOCTOR,
                     Status = ConstantHelper.STATUS.ACTIVE,
                     CreatedAt = DateTime.Now,
-                    LastIPConnection = HttpContext.Current.Request.UserHostAddress,
-                    PhoneNumber = model.PhoneNumber
+                    LastIPConnection = HttpContext.Current.Request.UserHostAddress
                 };
 
                 context.User.Add(user);
@@ -181,7 +180,7 @@ namespace FollowLifeAPI.Controllers
                 await context.SaveChangesAsync();
 
                 return Ok(HttpStatusCode.Created);
-                //model.DoctorId = doctor.Id;
+
                 //model.Password = "### HIDDEN ###";
 
                 //return Ok(model);

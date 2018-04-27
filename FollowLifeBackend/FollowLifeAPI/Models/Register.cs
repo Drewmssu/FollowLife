@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace FollowLifeAPI.Models.Patient
+namespace FollowLifeAPI.Models
 {
-    public class PRegister
+    public class Register
     {
-        public int? PatientId { get; set; }
         [Required(AllowEmptyStrings = false)]
         public string FirstName { get; set; } = string.Empty;
         [Required(AllowEmptyStrings = false)]
