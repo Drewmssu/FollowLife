@@ -14,26 +14,49 @@ namespace FollowLifeAPI.Helpers
 
         public static string UploadImage(HttpPostedFileBase file)
         {
-            using (var client = new HttpClient())
+            try
             {
-                var request = new HttpRequestMessage
-                {
-                    RequestUri = new Uri(HttpContext.Current.Server.MapPath("~\\Upload\\ProfileImages\\")),
-                    Method = HttpMethod.Post,
-                    Content = new StreamContent(file.InputStream)
-                };
+                var extension = file.FileName.Split('.').Last();
+                string[] allowedExtensions = { "JPG", "PNG" };
 
-                request.Content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                if (!allowedExtensions.Contains(extension.ToUpper()))
+                    return null;
 
-                using (var response = client.SendAsync(request).Result)
-                {
-                    using (var content = response.Content)
-                    {
-                        return JsonConvert.DeserializeObject<string>(content.ReadAsStringAsync().Result);
-                    }
-                }
+                var basePath = HttpContext.Current.Server.MapPath("~\\Upload\\ProfileImages\\");
+                var fileName = $"{Guid.NewGuid().ToString().Split('-')[1]}_{file.FileName}";
+                var path = basePath + fileName;
+                file.SaveAs(path);
+
+                return fileName;
+            }
+            catch
+            {
+                return null;
             }
         }
+
+        //public static string UploadImage(HttpPostedFileBase file)
+        //{
+        //    using (var client = new HttpClient())
+        //    {
+        //        var request = new HttpRequestMessage
+        //        {
+        //            RequestUri = new Uri(HttpContext.Current.Server.MapPath("~\\Upload\\ProfileImages\\")),
+        //            Method = HttpMethod.Post,
+        //            Content = new StreamContent(file.InputStream)
+        //        };
+
+        //        request.Content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+        //        using (var response = client.SendAsync(request).Result)
+        //        {
+        //            using (var content = response.Content)
+        //            {
+        //                return JsonConvert.DeserializeObject<string>(content.ReadAsStringAsync().Result);
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 }

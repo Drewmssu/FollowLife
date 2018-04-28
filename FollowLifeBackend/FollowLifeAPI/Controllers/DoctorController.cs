@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using Newtonsoft.Json.Linq;
 using System.Data.Entity;
 using System.Net;
 using FollowLifeLogic;
@@ -15,7 +14,6 @@ using FollowLifeAPI.BE;
 using System.Transactions;
 using FollowLifeAPI.Models.Appointment;
 using FollowLifeService.MailJet;
-using System.Collections.Generic;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -148,51 +146,56 @@ namespace FollowLifeAPI.Controllers
         {
             try
             {
-                if (model is null)
-                    return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
-
-                #region Validation
-
-                model.Email = model.Email.ToLower();
-
-                if (await context.User.AnyAsync(x => x.Email == model.Email))
-                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
-
-                #endregion
-
-                var user = new User
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Password = CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password),
-                    RoleId = ConstantHelper.ROLE.ID.DOCTOR,
-                    Status = ConstantHelper.STATUS.ACTIVE,
-                    CreatedAt = DateTime.Now,
-                    LastIPConnection = HttpContext.Current.Request.UserHostAddress
-                };
+                    if (model is null)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
 
-                context.User.Add(user);
-                await context.SaveChangesAsync();
+                    #region Validation
 
-                var doctor = new Doctor
-                {
-                    UserId = user.Id,
-                    Status = ConstantHelper.STATUS.ACTIVE,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
+                    model.Email = model.Email.ToLower();
 
-                context.Doctor.Add(doctor);
-                await context.SaveChangesAsync();
+                    if (await context.User.AnyAsync(x => x.Email == model.Email))
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
 
-                var result = new
-                {
-                    code = HttpStatusCode.Created,
-                    message = "Success"
-                };
+                    #endregion
 
-                return Ok(result);
+                    var user = new User
+                    {
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Email,
+                        Password = CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password),
+                        RoleId = ConstantHelper.ROLE.ID.DOCTOR,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                        CreatedAt = DateTime.Now,
+                        LastIPConnection = HttpContext.Current.Request.UserHostAddress
+                    };
+
+                    context.User.Add(user);
+                    await context.SaveChangesAsync();
+
+                    var doctor = new Doctor
+                    {
+                        UserId = user.Id,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+
+                    context.Doctor.Add(doctor);
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new
+                    {
+                        code = HttpStatusCode.Created,
+                        message = "Success"
+                    };
+
+                    return Ok(result);
+                }
             }
             catch (ArgumentNullException)
             {
@@ -277,7 +280,16 @@ namespace FollowLifeAPI.Controllers
 
                     user.PhoneNumber = model.PhoneNumber;
                     doctor.MedicIdentification = model.MedicalIdentification;
-                    
+
+                    await context.SaveChangesAsync();
+
+                    if (model.ProfilePicture != null)
+                    {
+                        var image = ImageHelper.UploadImage(model.ProfilePicture);
+                        if (image != null)
+                            user.ProfilePicture = image;
+                    }
+
                     await context.SaveChangesAsync();
 
                     if (model.District.HasValue)
@@ -353,60 +365,6 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("doctor/uploadImage")]
-        public async Task<IHttpActionResult> UploadProfilePicture(ImageModel model)
-        {
-            try
-            {
-                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    if (model is null)
-                        throw new ArgumentNullException();
-
-                    if (!ModelState.IsValid)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
-
-                    var userId = GetUserId();
-
-                    if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
-
-                    var user = await context.User.FindAsync(userId);
-
-                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
-
-                    var doctor = user.Doctor.FirstOrDefault();
-
-                    if (model.File != null)
-                    {
-                        var image = ImageHelper.UploadImage(model.File);
-                        if (image != null)
-                            user.ProfilePicture = image;
-                    }
-
-                    transaction.Complete();
-
-                    var result = new
-                    {
-                        Code = HttpStatusCode.Created,
-                        Message = "Image uploaded successfully"
-                    };
-
-                    return Ok(result);
-                }
-            }
-            catch (ArgumentNullException)
-            {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
-            }
-            catch (Exception ex)
-            {
-                return new ErrorResult(ex.Message);
-            }
-        }
-
         [HttpPost]
         [Route("doctor/membership")]
         public async Task<IHttpActionResult> GenerateMembership(GenerateMembership model)
@@ -461,7 +419,7 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
 
                     transaction.Complete();
-                    
+
                     var result = new ErrorResult(ErrorHelper.STATUS_OK, "Your code expires at: " + membership.ExpiresAt);
 
                     return Ok(result);
@@ -477,7 +435,7 @@ namespace FollowLifeAPI.Controllers
                 }
             }
 
-                
+
         }
 
         [HttpGet]
@@ -493,7 +451,7 @@ namespace FollowLifeAPI.Controllers
                     return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                 var user = await context.User.FindAsync(userId);
-                
+
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                     return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
@@ -502,7 +460,7 @@ namespace FollowLifeAPI.Controllers
                 if (patientId.HasValue)
                 {
                     var patient = context.Membership.FirstOrDefault(x => x.PatientId == patientId &&
-                                                                         x.DoctorId == doctor.Id  &&
+                                                                         x.DoctorId == doctor.Id &&
                                                                          x.Status == ConstantHelper.STATUS.CONFIRMED)?.Patient;
 
                     if (patient is null)
@@ -608,7 +566,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("doctor/appointments")]
-        public async Task<IHttpActionResult> AddAppointment(AddAppointment model) 
+        public async Task<IHttpActionResult> AddAppointment(AddAppointment model)
         {
             try
             {

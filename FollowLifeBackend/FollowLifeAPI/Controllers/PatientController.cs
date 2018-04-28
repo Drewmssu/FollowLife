@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.Http;
 using FollowLifeAPI.BE;
 using FollowLifeAPI.Models.Appointment;
+using System.Net;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -34,7 +35,7 @@ namespace FollowLifeAPI.Controllers
 
                 #region Validation
 
-                var user = (await context.Doctor.FirstOrDefaultAsync(x => x.User.Email == model.Email.ToLower()))?.User;
+                var user = (await context.Patient.FirstOrDefaultAsync(x => x.User.Email == model.Email.ToLower()))?.User;
 
                 if (user is null)
                     return new ErrorResult(ErrorHelper.NOT_FOUND, "Invalid Identifier");
@@ -42,7 +43,7 @@ namespace FollowLifeAPI.Controllers
                 if (user.Status == ConstantHelper.STATUS.INACTIVE)
                     return new ErrorResult(ErrorHelper.NOT_FOUND, "Usuario Eliminado");
 
-                if (user.Status != ConstantHelper.STATUS.CONFIRMED ||
+                if (user.Status != ConstantHelper.STATUS.CONFIRMED &&
                     user.Status != ConstantHelper.STATUS.ACTIVE)
                     return new ErrorResult(ErrorHelper.NOT_FOUND, "User not found");
 
@@ -137,47 +138,56 @@ namespace FollowLifeAPI.Controllers
         {
             try
             {
-                if (model is null)
-                    return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
-
-                #region Validation
-
-                model.Email = model.Email.ToLower();
-
-                if (await context.User.AnyAsync(x => x.Email == model.Email))
-                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
-
-                #endregion
-
-                var user = new User
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email.ToLower(),
-                    Password = model.Password,
-                    RoleId = ConstantHelper.ROLE.ID.PATIENT,
-                    Status = ConstantHelper.STATUS.ACTIVE,
-                    CreatedAt = DateTime.Now,
-                    LastIPConnection = HttpContext.Current.Request.UserHostAddress
-                };
+                    if (model is null)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
 
-                context.User.Add(user);
-                await context.SaveChangesAsync();
+                    #region Validation
 
-                var patient = new Patient
-                {
-                    UserId = user.Id,
-                    Status = ConstantHelper.STATUS.ACTIVE,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                };
+                    model.Email = model.Email.ToLower();
 
-                context.Patient.Add(patient);
-                await context.SaveChangesAsync();
+                    if (await context.User.AnyAsync(x => x.Email == model.Email))
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
 
-                model.Password = "### HIDDEN ###";
+                    #endregion
 
-                return Ok(model);
+                    var user = new User
+                    {
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Email.ToLower(),
+                        Password = CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password),
+                        RoleId = ConstantHelper.ROLE.ID.PATIENT,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                        CreatedAt = DateTime.Now,
+                        LastIPConnection = HttpContext.Current.Request.UserHostAddress
+                    };
+
+                    context.User.Add(user);
+                    await context.SaveChangesAsync();
+
+                    var patient = new Patient
+                    {
+                        UserId = user.Id,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+
+                    context.Patient.Add(patient);
+
+                    await context.SaveChangesAsync();
+                    transaction.Complete();
+
+                    var result = new
+                    {
+                        code = HttpStatusCode.Created,
+                        message = "Success"
+                    };
+
+                    return Ok(result);
+                }
             }
             catch (ArgumentNullException)
             {

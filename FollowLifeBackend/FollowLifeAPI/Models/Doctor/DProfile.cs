@@ -11,6 +11,7 @@ namespace FollowLifeAPI.Models.Doctor
         [MinLength(9)]
         public string PhoneNumber { get; set; }
         public string MedicalIdentification { get; set; }
+        public HttpPostedFileBase ProfilePicture { get; set; }
 
         //Address
         [MaxLength(5)]

@@ -16,7 +16,8 @@ namespace FollowLifeLogic
             return token;
         }
 
-        public static bool ValidateToken(string token, int maxValidHours = 365 * 24)
+        //expiration time = 6 months
+        public static bool ValidateToken(string token, int maxValidHours = 365 * 4320)
         {
             try
             {
