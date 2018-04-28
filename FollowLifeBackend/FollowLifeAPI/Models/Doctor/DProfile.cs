@@ -7,10 +7,10 @@ using System.Web;
 namespace FollowLifeAPI.Models.Doctor
 {
     public class DProfile
-    {
-        public HttpPostedFileBase ProfileImage { get; set; }
+    {        
         [MinLength(9)]
         public string PhoneNumber { get; set; }
+        public string MedicalIdentification { get; set; }
 
         //Address
         [MaxLength(5)]
@@ -22,8 +22,6 @@ namespace FollowLifeAPI.Models.Doctor
         [MaxLength(100)]
         public string Street { get; set; } = string.Empty;
         public int? District { get; set; }
-
-        //Medical Specialities
         public int[] MedicalSpecialities{ get; set; }
     }
 }

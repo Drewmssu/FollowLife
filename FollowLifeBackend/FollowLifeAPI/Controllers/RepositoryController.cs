@@ -75,5 +75,37 @@ namespace FollowLifeAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("repository/districts")]
+        [Route("repository/districts/{districtId}")]
+        public async Task<IHttpActionResult> Districts(int? districtId = null)
+        {
+            if (districtId.HasValue)
+            {
+                var element = await context.District.FindAsync(districtId);
+
+                if (element != null)
+                    return Ok(new Element
+                    {
+                        Code = element.Id,
+                        Text = element.Name
+                    });
+            }
+
+            var result = new ConcurrentBag<Element>();
+            var collection = await context.District.ToListAsync();
+
+            Parallel.ForEach(collection, element =>
+            {
+                result.Add(new Element
+                {
+                    Code = element.Id,
+                    Text = element.Name
+                });
+            });
+
+            return Ok(result);
+        }
     }
 }

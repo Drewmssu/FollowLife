@@ -15,6 +15,7 @@ using FollowLifeAPI.BE;
 using System.Transactions;
 using FollowLifeAPI.Models.Appointment;
 using FollowLifeService.MailJet;
+using System.Collections.Generic;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -222,7 +223,8 @@ namespace FollowLifeAPI.Controllers
                 var doctor = user?.Doctor.FirstOrDefault();
 
                 if (doctor != null)
-                    return Ok(new
+                {
+                    var result = new
                     {
                         firstName = user.FirstName,
                         lastName = user.LastName,
@@ -233,7 +235,10 @@ namespace FollowLifeAPI.Controllers
                         address = new AddressBE().Fill(doctor.Address),
                         medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
                         numberOfPatients = doctor.Membership.Count(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED)
-                    });
+                    };
+
+                    return Ok(result);
+                }
 
                 throw new Exception();
             }
@@ -271,28 +276,22 @@ namespace FollowLifeAPI.Controllers
                     var address = doctor.Address;
 
                     user.PhoneNumber = model.PhoneNumber;
-
+                    doctor.MedicIdentification = model.MedicalIdentification;
+                    
                     await context.SaveChangesAsync();
 
-                    if (model.ProfileImage != null)
-                    {
-                        var image = ImageHelper.UploadImage(model.ProfileImage);
-                        if (image != null)
-                            user.ProfilePicture = image;
-                    }
-
-                    await context.SaveChangesAsync();
-
-                    if (!model.District.HasValue)
+                    if (model.District.HasValue)
                     {
                         if (address is null)
                         {
                             address = new Address
                             {
                                 CreatedAt = DateTime.Now,
-                                UpdatedAt = DateTime.Now
+                                UpdatedAt = DateTime.Now,
+                                Status = ConstantHelper.STATUS.ACTIVE
                             };
 
+                            doctor.AddressId = address.Id;
                             context.Address.Add(address);
                         }
                         else
@@ -328,10 +327,9 @@ namespace FollowLifeAPI.Controllers
 
                     var result = new
                     {
-                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
                         phoneNumber = model.PhoneNumber,
 
-                        district = address?.District.Id,
+                        districtId = address?.DistrictId,
                         street = address?.Street,
                         complement = address?.Complement,
                         number = address?.Number,
@@ -341,6 +339,60 @@ namespace FollowLifeAPI.Controllers
                     };
 
                     transaction.Complete();
+
+                    return Ok(result);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("doctor/uploadImage")]
+        public async Task<IHttpActionResult> UploadProfilePicture(ImageModel model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+
+                    var doctor = user.Doctor.FirstOrDefault();
+
+                    if (model.File != null)
+                    {
+                        var image = ImageHelper.UploadImage(model.File);
+                        if (image != null)
+                            user.ProfilePicture = image;
+                    }
+
+                    transaction.Complete();
+
+                    var result = new
+                    {
+                        Code = HttpStatusCode.Created,
+                        Message = "Image uploaded successfully"
+                    };
 
                     return Ok(result);
                 }
