@@ -477,22 +477,23 @@ namespace FollowLifeAPI.Controllers
                         createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
-                        patient = new DoctorBE().Fill(appointment.Doctor),
-                        status = appointment.Status
+                        status = ConstantHelper.STATUS.GetStatus(appointment.Status),
+                        doctor = new DoctorBE().Fill(appointment.Doctor)
                     });
                 }
 
                 var today = DateTime.Now.Date;
-                var result = context.Appointment.Where(x => x.PatientId == patient.Id &&
-                                                            x.AppointmentDate >= today &&
-                                                            x.Status != ConstantHelper.STATUS.INACTIVE)
+                var result = user.Patient.FirstOrDefault().Appointment
+                                         .Where(x => x.PatientId == patient.Id &&
+                                                     x.AppointmentDate >= today &&
+                                                     x.Status != ConstantHelper.STATUS.INACTIVE)
                     .Select(x => new
                     {
                         id = x.Id,
                         date = x.AppointmentDate,
                         reason = x.Reason,
-                        doctor = new DoctorBE().Fill(x.Doctor),
-                        status = ConstantHelper.STATUS.GetStatus(x.Status)
+                        status = ConstantHelper.STATUS.GetStatus(x.Status),
+                        doctor = new DoctorBE().Fill(x.Doctor)
                     }).ToList();
 
                 return Ok(result);

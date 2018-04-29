@@ -23,7 +23,7 @@ namespace FollowLifeAPI.BE
             this.Name = $"{doctor.User.FirstName} {doctor.User.LastName}";
             this.PhoneNumber = doctor.User.PhoneNumber;
             this.Email = doctor.User.Email;
-            this.MedicalSpecialities = (string[])doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality.Name);
+            this.MedicalSpecialities = doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality.Name).ToArray();
 
             return this;
         }
