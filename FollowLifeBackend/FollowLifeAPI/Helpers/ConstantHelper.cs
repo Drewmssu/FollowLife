@@ -18,6 +18,22 @@ namespace FollowLifeAPI.Helpers
             public const string EXPIRED = "EXP";
             public const string REQUESTED = "REQ";
             public const string FINALIZED = "FIN";
+            public const string RESCHEDULE_REQUESTED = "RRQ";
+
+            public static string GetStatus(string status)
+            {
+                switch (status)
+                {
+                    case ACTIVE: return "Active";
+                    case INACTIVE: return "Inactive";
+                    case CONFIRMED: return "Confirmed";
+                    case EXPIRED: return "Expired";
+                    case REQUESTED: return "Requested";
+                    case FINALIZED: return "Finalized";
+                    case RESCHEDULE_REQUESTED: return "Reschedule_Requested";
+                    default: return null;
+                }
+            }
         }
 
         public static class ROLE

@@ -425,7 +425,7 @@ namespace FollowLifeAPI.Controllers
                     .Select(x => new
                     {
                         id = x.DoctorId,
-                        name = x.Doctor.User.FirstName + x.Doctor.User.LastName,
+                        name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
                         profileImage = ImageHelper.GetImageURL(x.Doctor.User.ProfilePicture)
                     }).ToList();
 
@@ -477,21 +477,23 @@ namespace FollowLifeAPI.Controllers
                         createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
-                        patient = new DoctorBE().Fill(appointment.Doctor)
+                        patient = new DoctorBE().Fill(appointment.Doctor),
+                        status = appointment.Status
                     });
                 }
 
-                var today = DateTime.Now;
+                var today = DateTime.Now.Date;
                 var result = context.Appointment.Where(x => x.PatientId == patient.Id &&
-                                                            x.Status == ConstantHelper.STATUS.CONFIRMED &&
-                                                            x.AppointmentDate >= today)
+                                                            x.AppointmentDate >= today &&
+                                                            x.Status != ConstantHelper.STATUS.INACTIVE)
                     .Select(x => new
                     {
                         id = x.Id,
                         date = x.AppointmentDate,
                         reason = x.Reason,
-                        doctor = new DoctorBE().Fill(x.Doctor)
-                    });
+                        doctor = new DoctorBE().Fill(x.Doctor),
+                        status = ConstantHelper.STATUS.GetStatus(x.Status)
+                    }).ToList();
 
                 return Ok(result);
 

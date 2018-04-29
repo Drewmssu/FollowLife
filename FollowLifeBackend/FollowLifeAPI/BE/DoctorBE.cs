@@ -20,7 +20,7 @@ namespace FollowLifeAPI.BE
                 return null;
 
             this.DoctorId = doctor.Id;
-            this.Name = doctor.User.FirstName + doctor.User.LastName;
+            this.Name = $"{doctor.User.FirstName} {doctor.User.LastName}";
             this.PhoneNumber = doctor.User.PhoneNumber;
             this.Email = doctor.User.Email;
             this.MedicalSpecialities = (string[])doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality.Name);

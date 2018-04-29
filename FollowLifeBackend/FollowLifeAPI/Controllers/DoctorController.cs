@@ -543,21 +543,24 @@ namespace FollowLifeAPI.Controllers
                         createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
+                        status = ConstantHelper.STATUS.GetStatus(appointment.Status),
                         patient = new PatientBE().Fill(appointment.Patient)
                     });
                 }
 
-                var today = DateTime.Now;
-                var result = context.Appointment.Where(x => x.DoctorId == doctor.Id &&
-                                                            x.Status == ConstantHelper.STATUS.CONFIRMED &&
-                                                            x.AppointmentDate >= today)
+                var today = DateTime.Now.Date;
+                var result = user.Doctor.FirstOrDefault().Appointment
+                                        .Where(x => x.DoctorId == doctor.Id &&
+                                                    x.Status != ConstantHelper.STATUS.INACTIVE &&
+                                                    x.AppointmentDate >= today)
                     .Select(x => new
                     {
                         id = x.Id,
                         date = x.AppointmentDate,
                         reason = x.Reason,
-                        patient = new PatientBE().Fill(x.Patient)
-                    });
+                        patient = new PatientBE().Fill(x.Patient),
+                        status = ConstantHelper.STATUS.GetStatus(x.Status)
+                    }).ToList();
 
                 return Ok(result);
 
@@ -587,6 +590,9 @@ namespace FollowLifeAPI.Controllers
                     if (model.AppointmentDate < DateTime.Now)
                         return new ErrorResult(ErrorHelper.BAD_REQUEST, "Date can't be before than today");
 
+                    if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Schedule not available");
+
                     var userId = GetUserId();
 
                     if (userId is null)
@@ -595,7 +601,7 @@ namespace FollowLifeAPI.Controllers
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);                    
 
                     #endregion
 
@@ -620,7 +626,11 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment added succesfully");
+                    var result = new
+                    {
+                        code = HttpStatusCode.Created,
+                        message = "success"
+                    };
 
                     return Ok(result);
                 }
@@ -672,7 +682,11 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment updated succesfully");
+                    var result = new
+                    {
+                        Code = HttpStatusCode.Created,
+                        Message = "success"
+                    };
 
                     return Ok(result);
                 }
