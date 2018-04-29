@@ -19,13 +19,14 @@ namespace FollowLifeAPI.Controllers
             try
             {
                 var token = Request.Headers.GetValues(ConstantHelper.TOKEN_HEADER_NAME).First();
+                var test = Request.Headers.GetValues(ConstantHelper.TOKEN_HEADER_NAME);
 
                 if (!TokenLogic.ValidateToken(token, ConstantHelper.TOKEN_TIMEOUT))
                     return null;
 
                 var user = context.User.FirstOrDefault(x => x.SessionToken == token &&
-                                                            x.Status == ConstantHelper.STATUS.CONFIRMED ||
-                                                            x.Status == ConstantHelper.STATUS.ACTIVE);
+                                                            (x.Status == ConstantHelper.STATUS.CONFIRMED ||
+                                                            x.Status == ConstantHelper.STATUS.ACTIVE));
 
                 return user?.Id;
             }

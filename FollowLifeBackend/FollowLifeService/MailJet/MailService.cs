@@ -1,11 +1,8 @@
 ﻿using Mailjet.Client;
 using Mailjet.Client.Resources;
-using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
-using System.Web;
-using System.Text;
 
 namespace FollowLifeService.MailJet
 {

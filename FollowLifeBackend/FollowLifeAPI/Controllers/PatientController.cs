@@ -123,8 +123,13 @@ namespace FollowLifeAPI.Controllers
                 user.SessionToken = null;
 
                 await context.SaveChangesAsync();
+                var response = new
+                {
+                    Code = HttpStatusCode.OK,
+                    Message = "success"
+                };
 
-                return Ok();
+                return Ok(response);
             }
             catch
             {
@@ -224,7 +229,12 @@ namespace FollowLifeAPI.Controllers
                         lastName = user.LastName,
                         phoneNumber = user.PhoneNumber,
                         profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                        email = user.Email
+                        email = user.Email,
+                        weight = patient.Weight,
+                        height = patient.Height,
+                        age = patient.Age,
+                        bloodType = patient.BloodType,
+                        sex = patient.Sex
                     });
 
                 throw new Exception();
@@ -262,11 +272,13 @@ namespace FollowLifeAPI.Controllers
                     var patient = user.Patient.FirstOrDefault();
 
                     user.PhoneNumber = model.PhoneNumber;
+                    user.UpdatedOn = DateTime.Now;
                     patient.Age = model.Age;
                     patient.Weight = model.Weight;
                     patient.Height = model.Height;
                     patient.BloodType = model.BloodType;
                     patient.Sex = model.Sex;
+                    patient.UpdatedAt = DateTime.Now;
 
                     await context.SaveChangesAsync();
 
@@ -330,6 +342,7 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var patient = user.Patient.FirstOrDefault();
+                    model.Code = model.Code.ToUpper();
                     var membership = await context.Membership.FirstOrDefaultAsync(x => x.ReferencedEmail == user.Email &&
                                                                                        x.Token == model.Code &&
                                                                                        x.Status == ConstantHelper.STATUS.ACTIVE);
@@ -346,7 +359,13 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    return Ok(new ErrorResult(ErrorHelper.STATUS_OK));
+                    var result = new
+                    {
+                        code = HttpStatusCode.OK,
+                        message = "success"
+                    };
+
+                    return Ok(result);
                 }
             }
             catch (ArgumentNullException)

@@ -280,6 +280,8 @@ namespace FollowLifeAPI.Controllers
 
                     user.PhoneNumber = model.PhoneNumber;
                     doctor.MedicIdentification = model.MedicalIdentification;
+                    user.UpdatedOn = DateTime.Now;
+                    doctor.UpdatedAt = DateTime.Now;
 
                     await context.SaveChangesAsync();
 
@@ -369,9 +371,9 @@ namespace FollowLifeAPI.Controllers
         [Route("doctor/membership")]
         public async Task<IHttpActionResult> GenerateMembership(GenerateMembership model)
         {
-            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            try
             {
-                try
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
                         throw new ArgumentNullException();
@@ -420,22 +422,24 @@ namespace FollowLifeAPI.Controllers
 
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Your code expires at: " + membership.ExpiresAt);
+                    var result = new
+                    {
+                        Code = HttpStatusCode.OK,
+                        Message = "Your code expires at " + membership.ExpiresAt
+                    };
 
                     return Ok(result);
-
-                }
-                catch (ArgumentNullException)
-                {
-                    return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
-                }
-                catch (Exception ex)
-                {
-                    return new ErrorResult(ex.Message);
                 }
             }
 
-
+            catch (ArgumentNullException)
+            {
+                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -738,8 +742,6 @@ namespace FollowLifeAPI.Controllers
                 return new ErrorResult(ex.Message);
             }
         }
-
-
 
     }
 }
