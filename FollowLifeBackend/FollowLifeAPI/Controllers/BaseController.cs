@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Http;
-using System.Data.Entity;
-using FollowLifeDataLayer;
+using FollowLifeAPI.Models;
 using FollowLifeLogic;
 using FollowLifeAPI.Helpers;
-using FollowLifeAPI.Models;
+using FollowLifeAPI.DataLayer;
 
 namespace FollowLifeAPI.Controllers
 {

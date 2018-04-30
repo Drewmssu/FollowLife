@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="39fe2a4196494652843fe6677df7cbc5" Name="Diagram1">
+      <Diagram DiagramId="bed031081c2b4e9f8ea63630492f9565" Name="Diagram1">
         <EntityTypeShape EntityType="FollowLifeModel.Address" Width="1.5" PointX="6" PointY="15.875" IsExpanded="true" />
         <EntityTypeShape EntityType="FollowLifeModel.Appointment" Width="1.5" PointX="10.5" PointY="8.625" IsExpanded="true" />
         <EntityTypeShape EntityType="FollowLifeModel.Device" Width="1.5" PointX="5.25" PointY="11.375" IsExpanded="true" />

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FollowLifeAPI.DataLayer;
 using System.Linq;
-using System.Web;
-using FollowLifeDataLayer;
 
 namespace FollowLifeAPI.BE
 {

@@ -1,7 +1,5 @@
 ﻿using FollowLifeAPI.Helpers;
 using FollowLifeAPI.Models;
-using FollowLifeAPI.Models.Patient;
-using FollowLifeDataLayer;
 using FollowLifeLogic;
 using System;
 using System.Data.Entity;
@@ -13,6 +11,9 @@ using System.Web.Http;
 using FollowLifeAPI.BE;
 using FollowLifeAPI.Models.Appointment;
 using System.Net;
+using FollowLifeAPI.Extensions;
+using FollowLifeAPI.Models.Patient;
+using FollowLifeAPI.DataLayer;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -29,7 +30,7 @@ namespace FollowLifeAPI.Controllers
                     throw new ArgumentException();
 
                 if (!ModelState.IsValid)
-                    return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+                    return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                 #endregion
 
@@ -38,25 +39,25 @@ namespace FollowLifeAPI.Controllers
                 var user = (await context.Patient.FirstOrDefaultAsync(x => x.User.Email == model.Email.ToLower()))?.User;
 
                 if (user is null)
-                    return new ErrorResult(ErrorHelper.NOT_FOUND, "Invalid Identifier");
+                    return new HttpActionResult(HttpStatusCode.NotFound, "Invalid identifier");
 
                 if (user.Status == ConstantHelper.STATUS.INACTIVE)
-                    return new ErrorResult(ErrorHelper.NOT_FOUND, "Usuario Eliminado");
+                    return new HttpActionResult(HttpStatusCode.NotFound, "User has been deleted");
 
                 if (user.Status != ConstantHelper.STATUS.CONFIRMED &&
                     user.Status != ConstantHelper.STATUS.ACTIVE)
-                    return new ErrorResult(ErrorHelper.NOT_FOUND, "User not found");
+                    return new HttpActionResult(HttpStatusCode.NotFound, "User not found");
 
                 #endregion
 
                 #region Login
                 if (user.Password != CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password))
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED, "Invalid password");
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Invalid password");
 
                 #endregion
 
                 if (user.Role.ShortName != ConstantHelper.ROLE.PATIENT)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 if (!string.IsNullOrEmpty(user.SessionToken))
                 {
@@ -102,11 +103,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null Request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -119,7 +120,7 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var user = await context.User.FindAsync(userId);
 
@@ -133,7 +134,7 @@ namespace FollowLifeAPI.Controllers
             }
             catch
             {
-                return new ErrorResult();
+                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
             }
         }
 
@@ -146,14 +147,14 @@ namespace FollowLifeAPI.Controllers
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToSafeString());
+                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                     #region Validation
 
                     model.Email = model.Email.ToLower();
 
                     if (await context.User.AnyAsync(x => x.Email == model.Email))
-                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Email already exists");
+                        return new HttpActionResult(HttpStatusCode.BadRequest, "Email already exists");
 
                     #endregion
 
@@ -193,11 +194,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request data");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -210,12 +211,12 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var patient = user.Patient.FirstOrDefault();
 
@@ -238,13 +239,13 @@ namespace FollowLifeAPI.Controllers
             }
             catch
             {
-                return new ErrorResult();
+                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
             }
         }
 
         [HttpPut]
         [Route("patient/profile")]
-        public async Task<IHttpActionResult> Profile(PProfile model)
+        public async Task<IHttpActionResult> Profile(Models.Patient.PProfile model)
         {
             try
             {
@@ -254,17 +255,17 @@ namespace FollowLifeAPI.Controllers
                         throw new ArgumentNullException();
 
                     if (!ModelState.IsValid)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var patient = user.Patient.FirstOrDefault();
 
@@ -308,11 +309,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -328,17 +329,17 @@ namespace FollowLifeAPI.Controllers
                         throw new ArgumentNullException();
 
                     if (!ModelState.IsValid)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA);
+                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var patient = user.Patient.FirstOrDefault();
                     model.Code = model.Code.ToUpper();
@@ -347,10 +348,10 @@ namespace FollowLifeAPI.Controllers
                                                                                        x.Status == ConstantHelper.STATUS.ACTIVE);
 
                     if (membership is null)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Membership not found");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Membership not found");
 
                     if (membership.ExpiresAt < DateTime.Now)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Your code has expired");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Your code has expired");
 
                     membership.PatientId = patient.Id;
                     membership.Status = ConstantHelper.STATUS.CONFIRMED;
@@ -366,11 +367,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -384,12 +385,12 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var patient = user.Patient.FirstOrDefault();
 
@@ -400,7 +401,7 @@ namespace FollowLifeAPI.Controllers
                                                                          x.Status == ConstantHelper.STATUS.CONFIRMED)?.Doctor;
 
                     if (doctor is null)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Doctor does not exist");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Doctor does not exist");
 
                     //TODO: Validate if doctor membership is active (up to date on his payments)
                     //TODO: Returns indicator (IMPORTANT)
@@ -435,7 +436,7 @@ namespace FollowLifeAPI.Controllers
             }
             catch
             {
-                return new ErrorResult();
+                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
             }
         }
 
@@ -449,12 +450,12 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                    return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 var patient = user.Patient.FirstOrDefault();
 
@@ -463,16 +464,16 @@ namespace FollowLifeAPI.Controllers
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED)
-                        return new ErrorResult(ErrorHelper.FORBIDDEN, "Appointment not available");
+                        return new HttpActionResult(HttpStatusCode.Forbidden, "Appointment not available");
 
                     if (appointment.PatientId != patient.Id)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED, "Current user is not part of this appointment");
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "urrent user is not part of this appointment");
 
                     if (appointment.AppointmentDate < DateTime.Now)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment has expired");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment has expired");
 
                     return Ok(new
                     {
@@ -506,7 +507,7 @@ namespace FollowLifeAPI.Controllers
             }
             catch
             {
-                return new ErrorResult();
+                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
             }
         }
 
@@ -524,23 +525,23 @@ namespace FollowLifeAPI.Controllers
                         throw new ArgumentNullException();
 
                     if (!ModelState.IsValid)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                     if (model.AppointmentDate < DateTime.Now)
-                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Date can't be before than today");
+                        return new HttpActionResult(HttpStatusCode.BadRequest, "Date can't be before than today");
 
                     if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
-                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "There is already another appointment there");
+                        return new HttpActionResult(HttpStatusCode.BadRequest, "There is already another appointment there");
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     #endregion
 
@@ -558,7 +559,8 @@ namespace FollowLifeAPI.Controllers
                     };
 
                     if (appointment.DoctorId is null)
-                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Missing doctorId");
+                        return new HttpActionResult(HttpStatusCode.BadRequest, "Missing doctor Id");
+
 
                     context.Appointment.Add(appointment);
 
@@ -573,11 +575,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -593,37 +595,37 @@ namespace FollowLifeAPI.Controllers
                         throw new ArgumentNullException();
 
                     if (!ModelState.IsValid)
-                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
 
                     if (model.Action != ConstantHelper.AppointmentAction.Confirm &&
                         model.Action != ConstantHelper.AppointmentAction.Reschedule)
-                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Invalid Appointment Action");
+                        return new HttpActionResult(HttpStatusCode.BadRequest, "Invalid appointment action");
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var patient = user.Patient.FirstOrDefault();
 
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                     if (appointment.PatientId != patient.Id)
-                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
+                        return new HttpActionResult(HttpStatusCode.Forbidden, "What are you doing here");
 
                     if (model.Action == ConstantHelper.AppointmentAction.Confirm)
                     {
                         if (appointment.Status == ConstantHelper.STATUS.CONFIRMED ||
                             appointment.Status == ConstantHelper.STATUS.INACTIVE)
-                            return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                            return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                         appointment.Status = ConstantHelper.STATUS.CONFIRMED;
                     }
@@ -632,10 +634,10 @@ namespace FollowLifeAPI.Controllers
                     {
                         if (appointment.Status == ConstantHelper.STATUS.RESCHEDULE_REQUESTED ||
                             appointment.Status == ConstantHelper.STATUS.INACTIVE)
-                            return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                            return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                         if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
-                            return new ErrorResult(ErrorHelper.BAD_REQUEST, "There is already an appointment at that time");
+                            return new HttpActionResult(HttpStatusCode.BadRequest, "There is already an appointment at that time");
 
                         appointment.AppointmentDate = model.AppointmentDate.Value;
                         appointment.Status = ConstantHelper.STATUS.RESCHEDULE_REQUESTED;
@@ -655,11 +657,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 
@@ -674,27 +676,27 @@ namespace FollowLifeAPI.Controllers
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
-                        return new ErrorResult(ErrorHelper.UNAUTHORIZED);
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     var patient = user.Patient.FirstOrDefault();
 
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                     if (appointment.PatientId != patient.Id)
-                        return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
+                        return new HttpActionResult(HttpStatusCode.Forbidden, "What are you doing here");
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
                         appointment.Status != ConstantHelper.STATUS.REQUESTED &&
                         appointment.Status != ConstantHelper.STATUS.RESCHEDULE_REQUESTED)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                     appointment.UpdatedAt = DateTime.Now;
                     appointment.CanceledAt = DateTime.Now;
@@ -712,11 +714,11 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new ErrorResult(ErrorHelper.BAD_REQUEST, "Null request");
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
             }
             catch (Exception ex)
             {
-                return new ErrorResult(ex.Message);
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
             }
         }
 

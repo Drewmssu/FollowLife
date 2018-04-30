@@ -256,7 +256,7 @@ namespace FollowLifeAPI
 
         private static string GetXmlCommentsPath()
         {
-            return AppDomain.CurrentDomain.BaseDirectory + @"bin\FollowLifeAPI.xml";
+            return System.AppDomain.CurrentDomain.BaseDirectory + @"\bin\FollowLifeAPI.xml";
         }
     }
 }
