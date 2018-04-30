@@ -85,5 +85,10 @@ namespace FollowLifeAPI.Helpers
 
         public static string GetDataConfiguration(string key) => string.IsNullOrEmpty(key) ? string.Empty : ConfigurationManager.AppSettings[key].ToSafeString();
         public static string UniqueShortIdentifier => Guid.NewGuid().ToString().Substring(0, Guid.NewGuid().ToString().IndexOf("-", StringComparison.Ordinal)).ToUpper();
+        public enum AppointmentAction
+        {
+            Confirm = 1,
+            Reschedule = 2
+        }
     }
 }

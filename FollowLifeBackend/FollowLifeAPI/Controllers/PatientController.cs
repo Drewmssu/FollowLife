@@ -85,7 +85,7 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                 }
 
-                return Ok(new
+                response.Result = new
                 {
                     user.Id,
                     user.SessionToken,
@@ -94,8 +94,11 @@ namespace FollowLifeAPI.Controllers
                     user.Email,
                     ProfileImage = ImageHelper.GetImageURL(user.ProfilePicture),
                     user.PhoneNumber
-                });
+                };
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
 
+                return Ok(response);
             }
             catch (ArgumentNullException)
             {
@@ -123,11 +126,8 @@ namespace FollowLifeAPI.Controllers
                 user.SessionToken = null;
 
                 await context.SaveChangesAsync();
-                var response = new
-                {
-                    Code = HttpStatusCode.OK,
-                    Message = "success"
-                };
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
 
                 return Ok(response);
             }
@@ -185,13 +185,10 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new
-                    {
-                        code = HttpStatusCode.Created,
-                        message = "Success"
-                    };
+                    response.Code = HttpStatusCode.Created;
+                    response.Message = "success";
 
-                    return Ok(result);
+                    return Ok(response);
                 }
             }
             catch (ArgumentNullException)
@@ -291,7 +288,7 @@ namespace FollowLifeAPI.Controllers
 
                     await context.SaveChangesAsync();
 
-                    var result = new
+                    response.Result = new
                     {
                         profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
                         phoneNumber = user.PhoneNumber,
@@ -301,10 +298,12 @@ namespace FollowLifeAPI.Controllers
                         sex = patient.Sex,
                         bloodType = patient.BloodType,
                     };
+                    response.Code = HttpStatusCode.OK;
+                    response.Message = "success";
 
                     transaction.Complete();
 
-                    return Ok(result);
+                    return Ok(response);
                 }
             }
             catch (ArgumentNullException)
@@ -359,13 +358,10 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new
-                    {
-                        code = HttpStatusCode.OK,
-                        message = "success"
-                    };
+                    response.Code = HttpStatusCode.OK;
+                    response.Message = "success";
 
-                    return Ok(result);
+                    return Ok(response);
                 }
             }
             catch (ArgumentNullException)
@@ -408,8 +404,7 @@ namespace FollowLifeAPI.Controllers
 
                     //TODO: Validate if doctor membership is active (up to date on his payments)
                     //TODO: Returns indicator (IMPORTANT)
-
-                    return Ok(new
+                    response.Result = new
                     {
                         profileImage = ImageHelper.GetImageURL(doctor.User.ProfilePicture),
                         name = doctor.User.FirstName,
@@ -417,10 +412,14 @@ namespace FollowLifeAPI.Controllers
                         medicIndentification = doctor.MedicIdentification,
                         address = new AddressBE().Fill(doctor.Address),
                         medicalSpecialities = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality))
-                    });
+                    };
+                    response.Code = HttpStatusCode.OK;
+                    response.Message = "success";
+
+                    return Ok(response);
                 }
 
-                var result = patient.Membership.Where(x => x.PatientId == patient.Id &&
+                response.Result = patient.Membership.Where(x => x.PatientId == patient.Id &&
                                                            x.Status == ConstantHelper.STATUS.CONFIRMED)
                     .Select(x => new
                     {
@@ -429,7 +428,10 @@ namespace FollowLifeAPI.Controllers
                         profileImage = ImageHelper.GetImageURL(x.Doctor.User.ProfilePicture)
                     }).ToList();
 
-                return Ok(result);
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
+
+                return Ok(response);
             }
             catch
             {
@@ -483,7 +485,7 @@ namespace FollowLifeAPI.Controllers
                 }
 
                 var today = DateTime.Now.Date;
-                var result = user.Patient.FirstOrDefault().Appointment
+                response.Result = user.Patient.FirstOrDefault().Appointment
                                          .Where(x => x.PatientId == patient.Id &&
                                                      x.AppointmentDate >= today &&
                                                      x.Status != ConstantHelper.STATUS.INACTIVE)
@@ -496,7 +498,10 @@ namespace FollowLifeAPI.Controllers
                         doctor = new DoctorBE().Fill(x.Doctor)
                     }).ToList();
 
-                return Ok(result);
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
+
+                return Ok(response);
 
             }
             catch
@@ -524,6 +529,9 @@ namespace FollowLifeAPI.Controllers
                     if (model.AppointmentDate < DateTime.Now)
                         return new ErrorResult(ErrorHelper.BAD_REQUEST, "Date can't be before than today");
 
+                    if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "There is already another appointment there");
+
                     var userId = GetUserId();
 
                     if (userId is null)
@@ -531,7 +539,7 @@ namespace FollowLifeAPI.Controllers
 
                     var user = await context.User.FindAsync(userId);
 
-                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     #endregion
@@ -557,9 +565,10 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment added succesfully");
+                    response.Code = HttpStatusCode.Created;
+                    response.Message = "success";
 
-                    return Ok(result);
+                    return Ok(response);
                 }
             }
             catch (ArgumentNullException)
@@ -580,6 +589,16 @@ namespace FollowLifeAPI.Controllers
             {
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+                    if (model is null)
+                        throw new ArgumentNullException();
+
+                    if (!ModelState.IsValid)
+                        return new ErrorResult(ErrorHelper.INVALID_MODEL_DATA, ModelState.ToListString());
+
+                    if (model.Action != ConstantHelper.AppointmentAction.Confirm &&
+                        model.Action != ConstantHelper.AppointmentAction.Reschedule)
+                        return new ErrorResult(ErrorHelper.BAD_REQUEST, "Invalid Appointment Action");
+
                     var userId = GetUserId();
 
                     if (userId is null)
@@ -587,7 +606,7 @@ namespace FollowLifeAPI.Controllers
 
                     var user = await context.User.FindAsync(userId);
 
-                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var patient = user.Patient.FirstOrDefault();
@@ -600,20 +619,37 @@ namespace FollowLifeAPI.Controllers
                     if (appointment.PatientId != patient.Id)
                         return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
 
-                    if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
-                        appointment.Status != ConstantHelper.STATUS.REQUESTED)
-                        return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+                    if (model.Action == ConstantHelper.AppointmentAction.Confirm)
+                    {
+                        if (appointment.Status == ConstantHelper.STATUS.CONFIRMED ||
+                            appointment.Status == ConstantHelper.STATUS.INACTIVE)
+                            return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                        appointment.Status = ConstantHelper.STATUS.CONFIRMED;
+                    }
+
+                    if (model.Action == ConstantHelper.AppointmentAction.Reschedule)
+                    {
+                        if (appointment.Status == ConstantHelper.STATUS.RESCHEDULE_REQUESTED ||
+                            appointment.Status == ConstantHelper.STATUS.INACTIVE)
+                            return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
+
+                        if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
+                            return new ErrorResult(ErrorHelper.BAD_REQUEST, "There is already an appointment at that time");
+
+                        appointment.AppointmentDate = model.AppointmentDate.Value;
+                        appointment.Status = ConstantHelper.STATUS.RESCHEDULE_REQUESTED;
+                    }
 
                     appointment.UpdatedAt = DateTime.Now;
-                    appointment.AppointmentDate = model.AppointmentDate;
-                    appointment.Status = ConstantHelper.STATUS.REQUESTED;
 
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment updated succesfully");
+                    response.Code = HttpStatusCode.OK;
+                    response.Message = "success";
 
-                    return Ok(result);
+                    return Ok(response);
                 }
 
             }
@@ -642,7 +678,7 @@ namespace FollowLifeAPI.Controllers
 
                     var user = await context.User.FindAsync(userId);
 
-                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    if (user.RoleId != ConstantHelper.ROLE.ID.PATIENT)
                         return new ErrorResult(ErrorHelper.UNAUTHORIZED);
 
                     var patient = user.Patient.FirstOrDefault();
@@ -656,7 +692,8 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(ErrorHelper.FORBIDDEN, "What are you doing here");
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
-                        appointment.Status != ConstantHelper.STATUS.REQUESTED)
+                        appointment.Status != ConstantHelper.STATUS.REQUESTED &&
+                        appointment.Status != ConstantHelper.STATUS.RESCHEDULE_REQUESTED)
                         return new ErrorResult(ErrorHelper.NOT_FOUND, "Appointment does not exist");
 
                     appointment.UpdatedAt = DateTime.Now;
@@ -666,9 +703,10 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
-                    var result = new ErrorResult(ErrorHelper.STATUS_OK, "Appointment deleted succesfully");
+                    response.Code = HttpStatusCode.OK;
+                    response.Message = "success";
 
-                    return Ok(result);
+                    return Ok(response);
                 }
 
             }

@@ -7,12 +7,14 @@ using System.Data.Entity;
 using FollowLifeDataLayer;
 using FollowLifeLogic;
 using FollowLifeAPI.Helpers;
+using FollowLifeAPI.Models;
 
 namespace FollowLifeAPI.Controllers
 {
     public class BaseController : ApiController
     {
         protected FollowLifeEntities context = new FollowLifeEntities();
+        protected Response response = new Response();
 
         protected int? GetUserId()
         {
