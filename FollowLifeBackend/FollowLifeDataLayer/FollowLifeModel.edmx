@@ -70,21 +70,6 @@
           <Property Name="DoctorId" Type="int" Nullable="false" />
           <Property Name="MedicalSpecialityId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="DoctorPlan">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="DoctorId" Type="int" Nullable="false" />
-          <Property Name="PlanId" Type="int" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Frecuency">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Value" Type="varchar" MaxLength="70" Nullable="false" />
-        </EntityType>
         <EntityType Name="Indicator">
           <Key>
             <PropertyRef Name="Id" />
@@ -500,8 +485,6 @@
           <EntitySet Name="District" EntityType="Self.District" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Doctor" EntityType="Self.Doctor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DoctorMedicalSpeciality" EntityType="Self.DoctorMedicalSpeciality" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="DoctorPlan" EntityType="Self.DoctorPlan" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Frecuency" EntityType="Self.Frecuency" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Indicator" EntityType="Self.Indicator" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="IndicatorEntry" EntityType="Self.IndicatorEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="IndicatorType" EntityType="Self.IndicatorType" Schema="dbo" store:Type="Tables" />
@@ -612,8 +595,6 @@
           <EntitySet Name="District" EntityType="TestModel.District" />
           <EntitySet Name="Doctor" EntityType="TestModel.Doctor" />
           <EntitySet Name="DoctorMedicalSpeciality" EntityType="TestModel.DoctorMedicalSpeciality" />
-          <EntitySet Name="DoctorPlan" EntityType="TestModel.DoctorPlan" />
-          <EntitySet Name="Frecuency" EntityType="TestModel.Frecuency" />
           <EntitySet Name="Indicator" EntityType="TestModel.Indicator" />
           <EntitySet Name="IndicatorEntry" EntityType="TestModel.IndicatorEntry" />
           <EntitySet Name="IndicatorType" EntityType="TestModel.IndicatorType" />
@@ -791,21 +772,6 @@
           <Property Name="MedicalSpecialityId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Doctor" Relationship="TestModel.FK_DoctorMedicalSpeciality_Doctor" FromRole="DoctorMedicalSpeciality" ToRole="Doctor" />
           <NavigationProperty Name="MedicalSpeciality" Relationship="TestModel.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="DoctorMedicalSpeciality" ToRole="MedicalSpeciality" />
-        </EntityType>
-        <EntityType Name="DoctorPlan">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DoctorId" Type="Int32" Nullable="false" />
-          <Property Name="PlanId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Frecuency">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Value" Type="String" Nullable="false" MaxLength="70" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Indicator">
           <Key>
@@ -1316,23 +1282,6 @@
               <MappingFragment StoreEntitySet="DoctorMedicalSpeciality">
                 <ScalarProperty Name="MedicalSpecialityId" ColumnName="MedicalSpecialityId" />
                 <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DoctorPlan">
-            <EntityTypeMapping TypeName="TestModel.DoctorPlan">
-              <MappingFragment StoreEntitySet="DoctorPlan">
-                <ScalarProperty Name="PlanId" ColumnName="PlanId" />
-                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Frecuency">
-            <EntityTypeMapping TypeName="TestModel.Frecuency">
-              <MappingFragment StoreEntitySet="Frecuency">
-                <ScalarProperty Name="Value" ColumnName="Value" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

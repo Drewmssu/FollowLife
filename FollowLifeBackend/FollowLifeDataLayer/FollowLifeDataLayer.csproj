@@ -67,9 +67,6 @@
     <Compile Include="DoctorMedicalSpeciality.cs">
       <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="DoctorPlan.cs">
-      <DependentUpon>FollowLifeModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="FollowLifeModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -84,9 +81,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>FollowLifeModel.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Frecuency.cs">
-      <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Indicator.cs">
       <DependentUpon>FollowLifeModel.tt</DependentUpon>

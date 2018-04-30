@@ -31,8 +31,6 @@ namespace FollowLifeDataLayer
         public virtual DbSet<District> District { get; set; }
         public virtual DbSet<Doctor> Doctor { get; set; }
         public virtual DbSet<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
-        public virtual DbSet<DoctorPlan> DoctorPlan { get; set; }
-        public virtual DbSet<Frecuency> Frecuency { get; set; }
         public virtual DbSet<Indicator> Indicator { get; set; }
         public virtual DbSet<IndicatorEntry> IndicatorEntry { get; set; }
         public virtual DbSet<IndicatorType> IndicatorType { get; set; }

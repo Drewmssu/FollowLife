@@ -11,8 +11,6 @@
         <EntityTypeShape EntityType="TestModel.District" Width="1.5" PointX="0.75" PointY="6.625" />
         <EntityTypeShape EntityType="TestModel.Doctor" Width="1.5" PointX="5.25" PointY="10.5" />
         <EntityTypeShape EntityType="TestModel.DoctorMedicalSpeciality" Width="1.5" PointX="10.5" PointY="11.375" />
-        <EntityTypeShape EntityType="TestModel.DoctorPlan" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="TestModel.Frecuency" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="TestModel.Indicator" Width="1.5" PointX="13.5" PointY="6.875" />
         <EntityTypeShape EntityType="TestModel.IndicatorEntry" Width="1.5" PointX="15.75" PointY="7.375" />
         <EntityTypeShape EntityType="TestModel.IndicatorType" Width="1.5" PointX="11.25" PointY="3.25" />
