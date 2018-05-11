@@ -45,8 +45,6 @@ namespace FollowLifeLogic
 
         private static string Encrypt(byte[] iv, byte[] key, string plainText)
         {
-            var sal = Salt;
-
             var plainBytes = Encoding.UTF8.GetBytes($"{Salt}{plainText}");
 
             var rijndael = Rijndael.Create();

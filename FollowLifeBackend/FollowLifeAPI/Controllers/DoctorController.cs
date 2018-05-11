@@ -18,9 +18,10 @@ using FollowLifeAPI.DataLayer;
 
 namespace FollowLifeAPI.Controllers
 {
+    [RoutePrefix("api/v1/doctors")]
     public class DoctorController : BaseController
     {
-        [Route("doctor/login")]
+        [Route("login")]
         [HttpPost]
         public async Task<IHttpActionResult> Login([FromBody]Login model)
         {
@@ -115,7 +116,7 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("doctor/logout")]
+        [Route("logout")]
         public async Task<IHttpActionResult> Logout()
         {
             try
@@ -143,7 +144,7 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpPost]
-        [Route("doctor/register")]
+        [Route("register")]
         public async Task<IHttpActionResult> Register(Register model)
         {
             try
@@ -207,8 +208,8 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("doctor/profile")]
-        public async Task<IHttpActionResult> Profile()
+        [Route("{doctorId}")]
+        public async Task<IHttpActionResult> Profile(int doctorId)
         {
             try
             {
@@ -222,27 +223,27 @@ namespace FollowLifeAPI.Controllers
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                     return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
-                var doctor = user?.Doctor.FirstOrDefault();
+                var doctor = await context.Doctor.FindAsync(doctorId);
 
-                if (doctor != null)
+                if (doctor is null || doctor.UserId != userId)
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+
+                response.Result = new
                 {
-                    response.Result = new
-                    {
-                        firstName = user.FirstName,
-                        lastName = user.LastName,
-                        phoneNumber = user.PhoneNumber,
-                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                        email = user.Email,
-                        medicIdentification = doctor.MedicIdentification,
-                        address = new AddressBE().Fill(doctor.Address),
-                        medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
-                        numberOfPatients = doctor.Membership.Count(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED)
-                    };
-                    response.Code = HttpStatusCode.OK;
-                    response.Message = "success";
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
+                    phoneNumber = user.PhoneNumber,
+                    profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                    email = user.Email,
+                    medicIdentification = doctor.MedicIdentification,
+                    address = new AddressBE().Fill(doctor.Address),
+                    medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
+                    numberOfPatients = doctor.Membership.Count(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED)
+                };
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
 
-                    return Ok(response);
-                }
+                return Ok(response);
 
                 throw new Exception();
             }
@@ -253,8 +254,8 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpPut]
-        [Route("doctor/profile")]
-        public async Task<IHttpActionResult> Profile(DProfile model)
+        [Route("{doctorId}")]
+        public async Task<IHttpActionResult> Profile(int doctorId, DProfile model)
         {
             try
             {
@@ -276,7 +277,11 @@ namespace FollowLifeAPI.Controllers
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                         return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
-                    var doctor = user.Doctor.FirstOrDefault();
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+
                     var address = doctor.Address;
 
                     user.PhoneNumber = model.PhoneNumber;
@@ -371,8 +376,8 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpPost]
-        [Route("doctor/membership")]
-        public async Task<IHttpActionResult> GenerateMembership(GenerateMembership model)
+        [Route("{doctorId}/membership")]
+        public async Task<IHttpActionResult> GenerateMembership(int doctorId, GenerateMembership model)
         {
             try
             {
@@ -394,7 +399,10 @@ namespace FollowLifeAPI.Controllers
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                         return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
-                    var doctor = user.Doctor.FirstOrDefault();
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                     model.Email = model.Email.ToLower();
 
@@ -443,9 +451,9 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("doctor/patients")]
-        [Route("doctor/patients/{patientId}")]
-        public async Task<IHttpActionResult> GetPatients(int? patientId = null)
+        [Route("{doctorId}/patients")]
+        [Route("{doctorId}/patients/{patientId}")]
+        public async Task<IHttpActionResult> GetPatients(int doctorId, int? patientId = null)
         {
             try
             {
@@ -459,7 +467,10 @@ namespace FollowLifeAPI.Controllers
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                     return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
-                var doctor = user.Doctor.FirstOrDefault();
+                var doctor = await context.Doctor.FindAsync(doctorId);
+
+                if (doctor is null || doctor.UserId != userId)
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 if (patientId.HasValue)
                 {
@@ -507,9 +518,9 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("doctor/appointments")]
-        [Route("doctor/appointments/{appointmentId}")]
-        public async Task<IHttpActionResult> GetAppointments(int? appointmentId = null)
+        [Route("{doctorId}/appointments")]
+        [Route("{doctorId}/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> GetAppointments(int doctorId, int? appointmentId = null)
         {
             try
             {
@@ -523,7 +534,10 @@ namespace FollowLifeAPI.Controllers
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
                     return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
-                var doctor = user.Doctor.FirstOrDefault();
+                var doctor = await context.Doctor.FindAsync(doctorId);
+
+                if (doctor is null || doctor.UserId != userId)
+                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
 
                 if (appointmentId.HasValue)
                 {
@@ -533,7 +547,7 @@ namespace FollowLifeAPI.Controllers
                         return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED)
-                        return new HttpActionResult(HttpStatusCode.Forbidden, "Appointment not available");                
+                        return new HttpActionResult(HttpStatusCode.Forbidden, "Appointment not available");
 
                     if (appointment.DoctorId != doctor.Id)
                         return new HttpActionResult(HttpStatusCode.Unauthorized, "Current user is not part of this appointment");

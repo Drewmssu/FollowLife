@@ -17,6 +17,7 @@ using FollowLifeAPI.DataLayer;
 
 namespace FollowLifeAPI.Controllers
 {
+    [RoutePrefix("api/v1")]  
     public class PatientController : BaseController
     {
         [HttpPost]

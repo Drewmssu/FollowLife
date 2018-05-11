@@ -4,12 +4,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
 namespace FollowLifeAPI.Controllers
 {
+    [RoutePrefix("api/v1")]
     public class RepositoryController : BaseController
     {
         [HttpGet]
@@ -41,7 +43,10 @@ namespace FollowLifeAPI.Controllers
                 });
             });
 
-            return Ok(result);
+            response.Code = HttpStatusCode.OK;
+            response.Message = "success";
+            response.Result = result;
+            return Ok(response);
         }
 
         [HttpGet]
@@ -105,7 +110,11 @@ namespace FollowLifeAPI.Controllers
                 });
             });
 
-            return Ok(result);
+            response.Code = HttpStatusCode.OK;
+            response.Message = "success";
+            response.Result = result;
+            
+            return Ok(response);
         }
     }
 }
