@@ -24,11 +24,16 @@ namespace FollowLifeAPI.Controllers
                 var element = await context.MedicalSpeciality.FindAsync(medicalSpecialityId);
 
                 if (element != null)
-                    return Ok(new Element
+                    response.Result = new Element
                     {
                         Code = element.Id,
                         Text = element.Name
-                    });
+                    };
+
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
+
+                return Ok(response);
             }
 
             var result = new ConcurrentBag<Element>();
@@ -59,11 +64,14 @@ namespace FollowLifeAPI.Controllers
                 var element = await context.ItemType.FindAsync(itemTypeId);
 
                 if (element != null)
-                    return Ok(new Element
+                    response.Result = new Element
                     {
                         Code = element.Id,
                         Text = element.Name
-                    });
+                    };
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
+                return Ok(response);
             }
 
             var result = new ConcurrentBag<Element>();
@@ -77,8 +85,11 @@ namespace FollowLifeAPI.Controllers
                     Text = element.Name
                 });
             });
+            response.Code = HttpStatusCode.OK;
+            response.Message = "success";
+            response.Result = result;
 
-            return Ok(result);
+            return Ok(response);
         }
 
         [HttpGet]
@@ -91,11 +102,15 @@ namespace FollowLifeAPI.Controllers
                 var element = await context.District.FindAsync(districtId);
 
                 if (element != null)
-                    return Ok(new Element
+                    response.Result = new Element
                     {
                         Code = element.Id,
                         Text = element.Name
-                    });
+                    };
+                response.Code = HttpStatusCode.OK;
+                response.Message = "success";
+
+                return Ok(response);
             }
 
             var result = new ConcurrentBag<Element>();

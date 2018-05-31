@@ -41,26 +41,51 @@ namespace FollowLifeAPI.Controllers
                 var user = (await context.Doctor.FirstOrDefaultAsync(x => x.User.Email == model.Email.ToLower()))?.User;
 
                 if (user is null)
-                    return new HttpActionResult(HttpStatusCode.NotFound, "Invalid identifier");
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Not Found, invalid identifier";
+                    return new ErrorResult(response, Request);
+                }
 
                 if (user.Status == ConstantHelper.STATUS.INACTIVE)
-                    return new HttpActionResult(HttpStatusCode.NotFound, "User deleted");
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Not Found, user deleted";
+                    return new ErrorResult(response, Request);
+                }
 
                 if (user.Status != ConstantHelper.STATUS.CONFIRMED &&
                     user.Status != ConstantHelper.STATUS.ACTIVE)
-                    return new HttpActionResult(HttpStatusCode.NotFound, "User not found");
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Not Found, user not found";
+                    return new ErrorResult(response, Request);
+                }
 
                 #endregion
 
                 #region Login
 
                 if (user.Password != CipherLogic.Cipher(CipherBCAction.Encrypt, CipherBCType.UserPassword, model.Password))
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Invalid password");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unahutorized, invalid password";
+                    return new ErrorResult(response, Request);
+                }
 
                 #endregion
 
                 if (user.Role.ShortName != ConstantHelper.ROLE.DOCTOR)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unahutorized, not a doctor";
+                    return new ErrorResult(response, Request);
+                }
 
                 if (!string.IsNullOrEmpty(user.SessionToken))
                 {
@@ -100,19 +125,24 @@ namespace FollowLifeAPI.Controllers
                     user.PhoneNumber
                 };
                 response.Code = HttpStatusCode.OK;
-                response.Message = "success";
+                response.Status = "ok";
 
                 return Ok(response);
             }
             catch (ArgumentNullException)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null Request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "Null Request";
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
-
         }
 
         [HttpGet]
@@ -124,7 +154,12 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var user = await context.User.FindAsync(userId);
 
@@ -139,7 +174,10 @@ namespace FollowLifeAPI.Controllers
             }
             catch
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "An error has ocurred";
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -152,14 +190,24 @@ namespace FollowLifeAPI.Controllers
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
-                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                    {
+                        response.Code = HttpStatusCode.NoContent;
+                        response.Status = "error";
+                        response.Message = ModelState.ToSafeString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     #region Validation
 
                     model.Email = model.Email.ToLower();
 
                     if (await context.User.AnyAsync(x => x.Email == model.Email))
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Email already exists");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Email already exists";
+                        return new ErrorResult(response, Request);
+                    }
 
                     #endregion
 
@@ -191,19 +239,25 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
+                    response.Status = "ok";
                     response.Code = HttpStatusCode.Created;
-                    response.Message = "success";
 
                     return Ok(response);
                 }
             }
             catch (ArgumentNullException)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "Null Request";
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -216,17 +270,32 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var doctor = await context.Doctor.FindAsync(doctorId);
 
                 if (doctor is null || doctor.UserId != userId)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 response.Result = new
                 {
@@ -241,15 +310,16 @@ namespace FollowLifeAPI.Controllers
                     numberOfPatients = doctor.Membership.Count(x => x.DoctorId == doctor.Id && x.Status == ConstantHelper.STATUS.CONFIRMED)
                 };
                 response.Code = HttpStatusCode.OK;
-                response.Message = "success";
+                response.Status = "ok";
 
                 return Ok(response);
-
-                throw new Exception();
             }
             catch
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "An error has ocurred";
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -262,25 +332,50 @@ namespace FollowLifeAPI.Controllers
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
-                        throw new ArgumentNullException();
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = new ArgumentNullException().Message;
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (!ModelState.IsValid)
-                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                    {
+                        response.Code = HttpStatusCode.NoContent;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     var doctor = await context.Doctor.FindAsync(doctorId);
 
                     if (doctor is null || doctor.UserId != userId)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     var address = doctor.Address;
 
@@ -367,11 +462,17 @@ namespace FollowLifeAPI.Controllers
             }
             catch (ArgumentNullException)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "Null request";
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -384,32 +485,62 @@ namespace FollowLifeAPI.Controllers
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
-                        throw new ArgumentNullException();
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = new ArgumentNullException().Message;
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (!ModelState.IsValid)
-                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var doctor = await context.Doctor.FindAsync(doctorId);
 
                     if (doctor is null || doctor.UserId != userId)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     model.Email = model.Email.ToLower();
 
                     var patient = await context.Patient.FirstOrDefaultAsync(x => x.User.Email == model.Email);
 
                     if (patient is null)
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "There is no user with that email");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "There is no user with that email";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var expirationDate = DateTime.Now.AddHours(24);
 
@@ -426,7 +557,12 @@ namespace FollowLifeAPI.Controllers
                     var emailResult = await MailService.SendMembershipEmail(membership.ReferencedEmail, patient.User.FirstName, membership.Token);
 
                     if (emailResult != "success")
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Email could not be sent, please try again");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Email could not be sent, please try again";
+                        return new ErrorResult(response, Request);
+                    }
 
                     context.Membership.Add(membership);
                     await context.SaveChangesAsync();
@@ -434,19 +570,25 @@ namespace FollowLifeAPI.Controllers
                     transaction.Complete();
 
                     response.Code = HttpStatusCode.OK;
+                    response.Status = "ok";
                     response.Message = "Your code expires at " + membership.ExpiresAt;
 
                     return Ok(response);
                 }
             }
-
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -460,17 +602,32 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var doctor = await context.Doctor.FindAsync(doctorId);
 
                 if (doctor is null || doctor.UserId != userId)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 if (patientId.HasValue)
                 {
@@ -479,7 +636,12 @@ namespace FollowLifeAPI.Controllers
                                                                          x.Status == ConstantHelper.STATUS.CONFIRMED)?.Patient;
 
                     if (patient is null)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Patient does not exist");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Patient does not exist";
+                        return new ErrorResult(response, Request);
+                    }
 
                     //TODO: Validate if patient membership is active (up to date on his payments)
                     //TODO: Returns indicator (IMPORTANT)
@@ -507,13 +669,16 @@ namespace FollowLifeAPI.Controllers
                     }).ToList();
 
                 response.Code = HttpStatusCode.OK;
-                response.Message = "success";
+                response.Status = "ok";
 
                 return Ok(response);
             }
             catch
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "An error has ocurred";
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -527,33 +692,68 @@ namespace FollowLifeAPI.Controllers
                 var userId = GetUserId();
 
                 if (userId is null)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var user = await context.User.FindAsync(userId);
 
                 if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 var doctor = await context.Doctor.FindAsync(doctorId);
 
                 if (doctor is null || doctor.UserId != userId)
-                    return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
 
                 if (appointmentId.HasValue)
                 {
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Appointment does not exist";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED)
-                        return new HttpActionResult(HttpStatusCode.Forbidden, "Appointment not available");
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "Appointment not available";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.DoctorId != doctor.Id)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Current user is not part of this appointment");
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "Current user is not part of this appointment";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.AppointmentDate < DateTime.Now)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment has expired");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Appointment has expired";
+                        return new ErrorResult(response, Request);
+                    }
 
                     return Ok(new
                     {
@@ -566,7 +766,7 @@ namespace FollowLifeAPI.Controllers
                 }
 
                 var today = DateTime.Now.Date;
-                var result = user.Doctor.FirstOrDefault().Appointment
+                response.Result = user.Doctor.FirstOrDefault().Appointment
                                         .Where(x => x.DoctorId == doctor.Id &&
                                                     x.Status != ConstantHelper.STATUS.INACTIVE &&
                                                     x.AppointmentDate >= today)
@@ -579,18 +779,23 @@ namespace FollowLifeAPI.Controllers
                         status = ConstantHelper.STATUS.GetStatus(x.Status)
                     }).ToList();
 
-                return Ok(result);
+                response.Status = "ok";
+                response.Code = HttpStatusCode.OK;
 
+                return Ok(response);
             }
             catch
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "An error has ocurred");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "An error has ocurred";
+                return new ErrorResult(response, Request);
             }
         }
 
         [HttpPost]
-        [Route("doctor/appointments")]
-        public async Task<IHttpActionResult> AddAppointment(AddAppointment model)
+        [Route("{doctorId}/appointments")]
+        public async Task<IHttpActionResult> AddAppointment(int doctorId, AddAppointment model)
         {
             try
             {
@@ -599,30 +804,68 @@ namespace FollowLifeAPI.Controllers
                     #region Validation
 
                     if (model is null)
-                        throw new ArgumentNullException();
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = new ArgumentNullException().Message;
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (!ModelState.IsValid)
-                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                    {
+                        response.Code = HttpStatusCode.NoContent;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (model.AppointmentDate < DateTime.Now)
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Date can't be before than today");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Date can't be before than today";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Schedule not available");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Schedule not available";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     #endregion
-
-                    var doctor = user.Doctor.FirstOrDefault();
 
                     var appointment = new Appointment
                     {
@@ -636,7 +879,12 @@ namespace FollowLifeAPI.Controllers
                     };
 
                     if (appointment.PatientId is null)
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Missing patientId");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Missing patientId";
+                        return new ErrorResult(response, Request);
+                    }
 
                     context.Appointment.Add(appointment);
 
@@ -644,7 +892,7 @@ namespace FollowLifeAPI.Controllers
                     transaction.Complete();
 
                     response.Code = HttpStatusCode.Created;
-                    response.Message = "success";
+                    response.Status = "ok";
 
                     return Ok(response);
                 }
@@ -660,48 +908,96 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpPut]
-        [Route("doctor/appointments/{appointmentId}")]
-        public async Task<IHttpActionResult> UpdateAppointment(int appointmentId, [FromBody]UpdateAppointment model)
+        [Route("{doctorId}/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> UpdateAppointment(int doctorId, int appointmentId, [FromBody]UpdateAppointment model)
         {
             try
             {
                 using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     if (model is null)
-                        throw new ArgumentNullException();
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = new ArgumentNullException().Message;
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (!ModelState.IsValid)
-                        return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                    {
+                        response.Code = HttpStatusCode.NoContent;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (model.Action != ConstantHelper.AppointmentAction.Confirm &&
                         model.Action != ConstantHelper.AppointmentAction.Reschedule)
-                        return new HttpActionResult(HttpStatusCode.BadRequest, "Invalid appointment action");
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Invalid appointment action";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
-                    var doctor = user.Doctor.FirstOrDefault();
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Appointment does not exist";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.DoctorId != doctor.Id)
-                        return new HttpActionResult(HttpStatusCode.Forbidden, "What are you doing here");
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "What are you doing here";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (model.Action is ConstantHelper.AppointmentAction.Confirm)
                     {
                         if (appointment.Status == ConstantHelper.STATUS.CONFIRMED ||
                             appointment.Status == ConstantHelper.STATUS.INACTIVE)
-                            return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                        {
+                            response.Code = HttpStatusCode.NotFound;
+                            response.Status = "error";
+                            response.Message = "Appointment does not exist";
+                            return new ErrorResult(response, Request);
+                        }
 
                         appointment.Status = ConstantHelper.STATUS.CONFIRMED;
                     }
@@ -710,10 +1006,20 @@ namespace FollowLifeAPI.Controllers
                     {
                         if (appointment.Status == ConstantHelper.STATUS.RESCHEDULE_REQUESTED ||
                             appointment.Status == ConstantHelper.STATUS.INACTIVE)
-                            return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                        {
+                            response.Code = HttpStatusCode.NotFound;
+                            response.Status = "error";
+                            response.Message = "Appointment does not exist";
+                            return new ErrorResult(response, Request);
+                        }
 
                         if (await context.Appointment.AnyAsync(x => x.AppointmentDate == model.AppointmentDate))
-                            return new HttpActionResult(HttpStatusCode.BadRequest, "There is already an appointment at that time");
+                        {
+                            response.Code = HttpStatusCode.BadRequest;
+                            response.Status = "error";
+                            response.Message = "There is already an appointment at that time";
+                            return new ErrorResult(response, Request);
+                        }
 
                         appointment.AppointmentDate = model.AppointmentDate.Value;
                         appointment.Status = ConstantHelper.STATUS.RESCHEDULE_REQUESTED;
@@ -725,25 +1031,32 @@ namespace FollowLifeAPI.Controllers
                     transaction.Complete();
 
                     response.Code = HttpStatusCode.OK;
+                    response.Status = "ok";
                     response.Message = "success";
 
                     return Ok(response);
                 }
 
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 
         [HttpDelete]
-        [Route("doctor/appointments/{appointmentId}")]
-        public async Task<IHttpActionResult> CancelAppointment(int appointmentId)
+        [Route("{doctorId}/appointments/{appointmentId}")]
+        public async Task<IHttpActionResult> CancelAppointment(int doctorId, int appointmentId)
         {
             try
             {
@@ -752,27 +1065,60 @@ namespace FollowLifeAPI.Controllers
                     var userId = GetUserId();
 
                     if (userId is null)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var user = await context.User.FindAsync(userId);
 
                     if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
-                        return new HttpActionResult(HttpStatusCode.Unauthorized, "Unauthorized");
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
-                    var doctor = user.Doctor.FirstOrDefault();
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
 
                     var appointment = await context.Appointment.FindAsync(appointmentId);
 
                     if (appointment is null)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Appointment does not exist";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.DoctorId != doctor.Id)
-                        return new HttpActionResult(HttpStatusCode.Forbidden, "What are you doing here");
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "What are you doing here";
+                        return new ErrorResult(response, Request);
+                    }
 
                     if (appointment.Status != ConstantHelper.STATUS.CONFIRMED &&
                         appointment.Status != ConstantHelper.STATUS.REQUESTED &&
                         appointment.Status != ConstantHelper.STATUS.RESCHEDULE_REQUESTED)
-                        return new HttpActionResult(HttpStatusCode.NotFound, "Appointment does not exist");
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Appointment does not exist";
+                        return new ErrorResult(response, Request);
+                    }
 
                     appointment.UpdatedAt = DateTime.Now;
                     appointment.CanceledAt = DateTime.Now;
@@ -782,19 +1128,25 @@ namespace FollowLifeAPI.Controllers
                     transaction.Complete();
 
                     response.Code = HttpStatusCode.OK;
+                    response.Status = "ok";
                     response.Message = "success";
 
                     return Ok(response);
                 }
-
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 

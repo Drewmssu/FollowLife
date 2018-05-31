@@ -276,6 +276,7 @@
       <DependentUpon>FollowLifeModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Extensions\CentralizedPrefixProvider.cs" />
+    <Compile Include="Extensions\ErrorResult.cs" />
     <Compile Include="Extensions\HttpActionResult.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -449,7 +450,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>63897</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:63897/</IISUrl>
+          <IISUrl>http://localhost:63899/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://www.followlife.me/api/v1</CustomServerUrl>

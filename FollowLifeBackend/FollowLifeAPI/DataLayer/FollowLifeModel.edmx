@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="FollowLifeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="FollowLifeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Address">
           <Key>
             <PropertyRef Name="Id" />
@@ -76,11 +76,11 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PatientId" Type="int" Nullable="false" />
-          <Property Name="UniIfeasurementId" Type="int" />
+          <Property Name="UnitOfMeasurementId" Type="int" />
           <Property Name="Quantity" Type="decimal" Precision="5" Scale="2" />
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="IndicatorTypeId" Type="int" Nullable="false" />
-          <Property Name="Frecuency" Type="varchar" MaxLength="300" Nullable="false" />
+          <Property Name="Frequency" Type="varchar" MaxLength="300" Nullable="false" />
         </EntityType>
         <EntityType Name="IndicatorEntry">
           <Key>
@@ -96,7 +96,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UnitofMeasurementId" Type="int" Nullable="false" />
+          <Property Name="UnitOfMeasurementId" Type="int" Nullable="false" />
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Code" Type="varchar" MaxLength="3" />
         </EntityType>
@@ -366,7 +366,7 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="IndicatorType">
-              <PropertyRef Name="UnitofMeasurementId" />
+              <PropertyRef Name="UnitOfMeasurementId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -584,8 +584,7 @@
             <End Role="User" EntitySet="User" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="FollowLifeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -668,21 +667,6 @@
           <NavigationProperty Name="Doctor" Relationship="Self.FK_DoctorMedicalSpeciality_Doctor" FromRole="DoctorMedicalSpeciality" ToRole="Doctor" />
           <NavigationProperty Name="MedicalSpeciality" Relationship="Self.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="DoctorMedicalSpeciality" ToRole="MedicalSpeciality" />
         </EntityType>
-        <EntityType Name="Indicator">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PatientId" Type="Int32" Nullable="false" />
-          <Property Name="UniIfeasurementId" Type="Int32" />
-          <Property Name="Quantity" Type="Decimal" Precision="5" Scale="2" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="IndicatorTypeId" Type="Int32" Nullable="false" />
-          <Property Name="Frecuency" Type="String" MaxLength="300" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="IndicatorType" Relationship="Self.FK_Indicator_IndicatorType" FromRole="Indicator" ToRole="IndicatorType" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Indicator_Patient" FromRole="Indicator" ToRole="Patient" />
-          <NavigationProperty Name="IndicatorEntry" Relationship="Self.FK_IndicatorEntry_Indicator" FromRole="Indicator" ToRole="IndicatorEntry" />
-        </EntityType>
         <EntityType Name="IndicatorEntry">
           <Key>
             <PropertyRef Name="Id" />
@@ -691,18 +675,7 @@
           <Property Name="IndicatorId" Type="Int32" Nullable="false" />
           <Property Name="Value" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Indicator" Relationship="Self.FK_IndicatorEntry_Indicator" FromRole="IndicatorEntry" ToRole="Indicator" />
-        </EntityType>
-        <EntityType Name="IndicatorType">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UnitofMeasurementId" Type="Int32" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Indicator" Relationship="Self.FK_Indicator_IndicatorType" FromRole="IndicatorType" ToRole="Indicator" />
-          <NavigationProperty Name="UnitOfMeasurement" Relationship="Self.FK_IndicatorType_UnitOfMeasurement" FromRole="IndicatorType" ToRole="UnitOfMeasurement" />
+          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_IndicatorEntry_Indicator" FromRole="IndicatorEntry" ToRole="Indicator" />
         </EntityType>
         <EntityType Name="Item">
           <Key>
@@ -782,11 +755,11 @@
           <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
           <Property Name="Height" Type="Decimal" Precision="2" Scale="1" />
           <NavigationProperty Name="Appointment" Relationship="Self.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
-          <NavigationProperty Name="Indicator" Relationship="Self.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
           <NavigationProperty Name="Membership" Relationship="Self.FK_Membership_Patient" FromRole="Patient" ToRole="Membership" />
           <NavigationProperty Name="Plan" Relationship="Self.FK_Patient_Package" FromRole="Patient" ToRole="Plan" />
           <NavigationProperty Name="User" Relationship="Self.FK_Patient_User" FromRole="Patient" ToRole="User" />
           <NavigationProperty Name="Prescription" Relationship="Self.FK_Prescription_Patient" FromRole="Patient" ToRole="Prescription" />
+          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
         </EntityType>
         <EntityType Name="Plan">
           <Key>
@@ -828,7 +801,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="IndicatorType" Relationship="Self.FK_IndicatorType_UnitOfMeasurement" FromRole="UnitOfMeasurement" ToRole="IndicatorType" />
+          <NavigationProperty Name="IndicatorType" Relationship="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement" FromRole="UnitOfMeasurement" ToRole="IndicatorType" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -972,54 +945,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Indicator_IndicatorType">
-          <End Role="IndicatorType" Type="Self.IndicatorType" Multiplicity="1" />
-          <End Role="Indicator" Type="Self.Indicator" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="IndicatorType">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Indicator">
-              <PropertyRef Name="IndicatorTypeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Indicator_Patient">
-          <End Role="Patient" Type="Self.Patient" Multiplicity="1" />
-          <End Role="Indicator" Type="Self.Indicator" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Patient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Indicator">
-              <PropertyRef Name="PatientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_IndicatorEntry_Indicator">
-          <End Role="Indicator" Type="Self.Indicator" Multiplicity="1" />
-          <End Role="IndicatorEntry" Type="Self.IndicatorEntry" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Indicator">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="IndicatorEntry">
-              <PropertyRef Name="IndicatorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_IndicatorType_UnitOfMeasurement">
-          <End Role="UnitOfMeasurement" Type="Self.UnitOfMeasurement" Multiplicity="1" />
-          <End Role="IndicatorType" Type="Self.IndicatorType" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="UnitOfMeasurement">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="IndicatorType">
-              <PropertyRef Name="UnitofMeasurementId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Item_ItemType">
           <End Role="ItemType" Type="Self.ItemType" Multiplicity="0..1" />
           <End Role="Item" Type="Self.Item" Multiplicity="*" />
@@ -1111,9 +1036,7 @@
           <EntitySet Name="District" EntityType="Self.District" />
           <EntitySet Name="Doctor" EntityType="Self.Doctor" />
           <EntitySet Name="DoctorMedicalSpeciality" EntityType="Self.DoctorMedicalSpeciality" />
-          <EntitySet Name="Indicator" EntityType="Self.Indicator" />
           <EntitySet Name="IndicatorEntry" EntityType="Self.IndicatorEntry" />
-          <EntitySet Name="IndicatorType" EntityType="Self.IndicatorType" />
           <EntitySet Name="Item" EntityType="Self.Item" />
           <EntitySet Name="ItemType" EntityType="Self.ItemType" />
           <EntitySet Name="MedicalSpeciality" EntityType="Self.MedicalSpeciality" />
@@ -1165,22 +1088,6 @@
             <End Role="MedicalSpeciality" EntitySet="MedicalSpeciality" />
             <End Role="DoctorMedicalSpeciality" EntitySet="DoctorMedicalSpeciality" />
           </AssociationSet>
-          <AssociationSet Name="FK_Indicator_IndicatorType" Association="Self.FK_Indicator_IndicatorType">
-            <End Role="IndicatorType" EntitySet="IndicatorType" />
-            <End Role="Indicator" EntitySet="Indicator" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Indicator_Patient" Association="Self.FK_Indicator_Patient">
-            <End Role="Patient" EntitySet="Patient" />
-            <End Role="Indicator" EntitySet="Indicator" />
-          </AssociationSet>
-          <AssociationSet Name="FK_IndicatorEntry_Indicator" Association="Self.FK_IndicatorEntry_Indicator">
-            <End Role="Indicator" EntitySet="Indicator" />
-            <End Role="IndicatorEntry" EntitySet="IndicatorEntry" />
-          </AssociationSet>
-          <AssociationSet Name="FK_IndicatorType_UnitOfMeasurement" Association="Self.FK_IndicatorType_UnitOfMeasurement">
-            <End Role="UnitOfMeasurement" EntitySet="UnitOfMeasurement" />
-            <End Role="IndicatorType" EntitySet="IndicatorType" />
-          </AssociationSet>
           <AssociationSet Name="FK_Item_ItemType" Association="Self.FK_Item_ItemType">
             <End Role="ItemType" EntitySet="ItemType" />
             <End Role="Item" EntitySet="Item" />
@@ -1209,7 +1116,99 @@
             <End Role="Role" EntitySet="Role" />
             <End Role="User" EntitySet="User" />
           </AssociationSet>
+          <EntitySet Name="Indicator" EntityType="FollowLifeModel.Indicator" />
+          <EntitySet Name="IndicatorType" EntityType="FollowLifeModel.IndicatorType" />
+          <AssociationSet Name="FK_Indicator_IndicatorType" Association="FollowLifeModel.FK_Indicator_IndicatorType">
+            <End Role="IndicatorType" EntitySet="IndicatorType" />
+            <End Role="Indicator" EntitySet="Indicator" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Indicator_Patient" Association="FollowLifeModel.FK_Indicator_Patient">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Indicator" EntitySet="Indicator" />
+          </AssociationSet>
+          <AssociationSet Name="FK_IndicatorEntry_Indicator" Association="FollowLifeModel.FK_IndicatorEntry_Indicator">
+            <End Role="Indicator" EntitySet="Indicator" />
+            <End Role="IndicatorEntry" EntitySet="IndicatorEntry" />
+          </AssociationSet>
+          <AssociationSet Name="FK_IndicatorType_UnitOfMeasurement" Association="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement">
+            <End Role="UnitOfMeasurement" EntitySet="UnitOfMeasurement" />
+            <End Role="IndicatorType" EntitySet="IndicatorType" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Indicator">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="UnitOfMeasurementId" Type="Int32" />
+          <Property Name="Quantity" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IndicatorTypeId" Type="Int32" Nullable="false" />
+          <Property Name="Frequency" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="IndicatorType" Relationship="FollowLifeModel.FK_Indicator_IndicatorType" FromRole="Indicator" ToRole="IndicatorType" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Indicator_Patient" FromRole="Indicator" ToRole="Patient" />
+          <NavigationProperty Name="IndicatorEntry" Relationship="FollowLifeModel.FK_IndicatorEntry_Indicator" FromRole="Indicator" ToRole="IndicatorEntry" />
+        </EntityType>
+        <EntityType Name="IndicatorType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UnitOfMeasurementId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_Indicator_IndicatorType" FromRole="IndicatorType" ToRole="Indicator" />
+          <NavigationProperty Name="UnitOfMeasurement" Relationship="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement" FromRole="IndicatorType" ToRole="UnitOfMeasurement" />
+        </EntityType>
+        <Association Name="FK_Indicator_IndicatorType">
+          <End Type="FollowLifeModel.IndicatorType" Role="IndicatorType" Multiplicity="1" />
+          <End Type="FollowLifeModel.Indicator" Role="Indicator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IndicatorType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Indicator">
+              <PropertyRef Name="IndicatorTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Indicator_Patient">
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="1" />
+          <End Type="FollowLifeModel.Indicator" Role="Indicator" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Indicator">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_IndicatorEntry_Indicator">
+          <End Type="FollowLifeModel.Indicator" Role="Indicator" Multiplicity="1" />
+          <End Type="FollowLifeModel.IndicatorEntry" Role="IndicatorEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Indicator">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorEntry">
+              <PropertyRef Name="IndicatorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_IndicatorType_UnitOfMeasurement">
+          <End Type="FollowLifeModel.UnitOfMeasurement" Role="UnitOfMeasurement" Multiplicity="1" />
+          <End Type="FollowLifeModel.IndicatorType" Role="IndicatorType" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UnitOfMeasurement">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorType">
+              <PropertyRef Name="UnitOfMeasurementId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1287,19 +1286,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Indicator">
-            <EntityTypeMapping TypeName="FollowLifeModel.Indicator">
-              <MappingFragment StoreEntitySet="Indicator">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
-                <ScalarProperty Name="UniIfeasurementId" ColumnName="UniIfeasurementId" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="IndicatorTypeId" ColumnName="IndicatorTypeId" />
-                <ScalarProperty Name="Frecuency" ColumnName="Frecuency" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="IndicatorEntry">
             <EntityTypeMapping TypeName="FollowLifeModel.IndicatorEntry">
               <MappingFragment StoreEntitySet="IndicatorEntry">
@@ -1307,16 +1293,6 @@
                 <ScalarProperty Name="IndicatorId" ColumnName="IndicatorId" />
                 <ScalarProperty Name="Value" ColumnName="Value" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="IndicatorType">
-            <EntityTypeMapping TypeName="FollowLifeModel.IndicatorType">
-              <MappingFragment StoreEntitySet="IndicatorType">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UnitofMeasurementId" ColumnName="UnitofMeasurementId" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1454,6 +1430,29 @@
                 <ScalarProperty Name="LastIPConnection" ColumnName="LastIPConnection" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Indicator">
+            <EntityTypeMapping TypeName="FollowLifeModel.Indicator">
+              <MappingFragment StoreEntitySet="Indicator">
+                <ScalarProperty Name="Frequency" ColumnName="Frequency" />
+                <ScalarProperty Name="IndicatorTypeId" ColumnName="IndicatorTypeId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="UnitOfMeasurementId" ColumnName="UnitOfMeasurementId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IndicatorType">
+            <EntityTypeMapping TypeName="FollowLifeModel.IndicatorType">
+              <MappingFragment StoreEntitySet="IndicatorType">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="UnitOfMeasurementId" ColumnName="UnitOfMeasurementId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

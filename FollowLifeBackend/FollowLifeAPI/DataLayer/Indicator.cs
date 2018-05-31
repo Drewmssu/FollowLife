@@ -22,11 +22,11 @@ namespace FollowLifeAPI.DataLayer
     
         public int Id { get; set; }
         public int PatientId { get; set; }
-        public Nullable<int> UniIfeasurementId { get; set; }
+        public Nullable<int> UnitOfMeasurementId { get; set; }
         public Nullable<decimal> Quantity { get; set; }
         public System.DateTime CreatedAt { get; set; }
         public int IndicatorTypeId { get; set; }
-        public string Frecuency { get; set; }
+        public string Frequency { get; set; }
     
         public virtual IndicatorType IndicatorType { get; set; }
         public virtual Patient Patient { get; set; }

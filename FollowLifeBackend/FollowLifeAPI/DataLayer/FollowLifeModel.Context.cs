@@ -31,9 +31,7 @@ namespace FollowLifeAPI.DataLayer
         public virtual DbSet<District> District { get; set; }
         public virtual DbSet<Doctor> Doctor { get; set; }
         public virtual DbSet<DoctorMedicalSpeciality> DoctorMedicalSpeciality { get; set; }
-        public virtual DbSet<Indicator> Indicator { get; set; }
         public virtual DbSet<IndicatorEntry> IndicatorEntry { get; set; }
-        public virtual DbSet<IndicatorType> IndicatorType { get; set; }
         public virtual DbSet<Item> Item { get; set; }
         public virtual DbSet<ItemType> ItemType { get; set; }
         public virtual DbSet<MedicalSpeciality> MedicalSpeciality { get; set; }
@@ -45,5 +43,7 @@ namespace FollowLifeAPI.DataLayer
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Indicator> Indicator { get; set; }
+        public virtual DbSet<IndicatorType> IndicatorType { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace FollowLifeAPI.DataLayer
         }
     
         public int Id { get; set; }
-        public int UnitofMeasurementId { get; set; }
+        public int UnitOfMeasurementId { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
     
