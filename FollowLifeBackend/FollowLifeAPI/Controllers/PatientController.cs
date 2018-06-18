@@ -304,20 +304,23 @@ namespace FollowLifeAPI.Controllers
                     return new ErrorResult(response, Request);
                 }
 
-                if (patient != null)
-                    return Ok(new
-                    {
-                        firstName = user.FirstName,
-                        lastName = user.LastName,
-                        phoneNumber = user.PhoneNumber,
-                        profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                        email = user.Email,
-                        weight = patient.Weight,
-                        height = patient.Height,
-                        age = patient.Age,
-                        bloodType = patient.BloodType,
-                        sex = patient.Sex
-                    });
+                response.Result = new
+                {
+                    firstName = user.FirstName,
+                    lastName = user.LastName,
+                    phoneNumber = user.PhoneNumber,
+                    profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
+                    email = user.Email,
+                    weight = patient.Weight,
+                    height = patient.Height,
+                    age = patient.Age,
+                    bloodType = patient.BloodType,
+                    sex = patient.Sex
+                };
+                response.Code = HttpStatusCode.OK;
+                response.Status = "ok";
+
+                return Ok(response);
             }
             catch
             {
@@ -1000,12 +1003,12 @@ namespace FollowLifeAPI.Controllers
 
                     if (appointment is null)
                         if (patient is null || patient.UserId != userId)
-                    {
-                        response.Code = HttpStatusCode.NotFound;
-                        response.Status = "error";
-                        response.Message = "Appointment does not exist";
-                        return new ErrorResult(response, Request);
-                    }
+                        {
+                            response.Code = HttpStatusCode.NotFound;
+                            response.Status = "error";
+                            response.Message = "Appointment does not exist";
+                            return new ErrorResult(response, Request);
+                        }
 
                     if (appointment.PatientId != patient.Id)
                     {
