@@ -29,10 +29,20 @@ namespace FollowLifeAPI.Controllers
             {
                 #region User
                 if (model is null)
-                    throw new ArgumentException();
+                {
+                    response.Code = HttpStatusCode.BadRequest;
+                    response.Status = "error";
+                    response.Message = new ArgumentNullException().Message;
+                    return new ErrorResult(response, Request);
+                }
 
                 if (!ModelState.IsValid)
-                    return new HttpActionResult(HttpStatusCode.NoContent, ModelState.ToString());
+                {
+                    response.Code = HttpStatusCode.NoContent;
+                    response.Status = "error";
+                    response.Message = ModelState.ToString();
+                    return new ErrorResult(response, Request);
+                }
 
                 #endregion
 
