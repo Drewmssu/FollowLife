@@ -306,11 +306,7 @@ namespace FollowLifeAPI.Controllers
 
                 response.Result = new
                 {
-                    firstName = user.FirstName,
-                    lastName = user.LastName,
-                    phoneNumber = user.PhoneNumber,
-                    profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                    email = user.Email,
+                    user = new UserBE().Fill(patient.User),
                     weight = patient.Weight,
                     height = patient.Height,
                     age = patient.Age,
@@ -520,6 +516,7 @@ namespace FollowLifeAPI.Controllers
                     await context.SaveChangesAsync();
                     transaction.Complete();
 
+                    response.Status = "ok";
                     response.Code = HttpStatusCode.OK;
                     response.Message = "success";
 
@@ -600,7 +597,8 @@ namespace FollowLifeAPI.Controllers
                         medicalSpecialities = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality))
                     };
                     response.Code = HttpStatusCode.OK;
-                    response.Message = "success";
+                    response.Status = "ok";
+
 
                     return Ok(response);
                 }
@@ -615,7 +613,7 @@ namespace FollowLifeAPI.Controllers
                     }).ToList();
 
                 response.Code = HttpStatusCode.OK;
-                response.Message = "success";
+                response.Status = "ok";
 
                 return Ok(response);
             }
@@ -701,14 +699,18 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(response, Request);
                     }
 
-                    return Ok(new
+                    response.Code = HttpStatusCode.OK;
+                    response.Status = "ok";
+                    response.Result = new
                     {
                         createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
                         status = ConstantHelper.STATUS.GetStatus(appointment.Status),
                         doctor = new DoctorBE().Fill(appointment.Doctor)
-                    });
+                    };
+
+                    return Ok(response);
                 }
 
                 var today = DateTime.Now.Date;

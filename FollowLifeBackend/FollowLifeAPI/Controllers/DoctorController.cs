@@ -309,11 +309,7 @@ namespace FollowLifeAPI.Controllers
 
                 response.Result = new
                 {
-                    firstName = user.FirstName,
-                    lastName = user.LastName,
-                    phoneNumber = user.PhoneNumber,
-                    profileImage = ImageHelper.GetImageURL(user.ProfilePicture),
-                    email = user.Email,
+                    user = new UserBE().Fill(doctor.User),
                     medicIdentification = doctor.MedicIdentification,
                     address = new AddressBE().Fill(doctor.Address),
                     medicalSpeciality = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
@@ -765,14 +761,17 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(response, Request);
                     }
 
-                    return Ok(new
+                    response.Code = HttpStatusCode.OK;
+                    response.Status = "ok";
+                    response.Result = new
                     {
-                        createdAt = appointment.CreatedAt,
                         appointmentDate = appointment.AppointmentDate,
                         reason = appointment.Reason,
                         status = ConstantHelper.STATUS.GetStatus(appointment.Status),
                         patient = new PatientBE().Fill(appointment.Patient)
-                    });
+                    };
+
+                    return Ok(response);
                 }
 
                 var today = DateTime.Now.Date;
@@ -783,7 +782,7 @@ namespace FollowLifeAPI.Controllers
                     .Select(x => new
                     {
                         id = x.Id,
-                        date = x.AppointmentDate,
+                        appointmentDate = x.AppointmentDate,
                         reason = x.Reason,
                         patient = new PatientBE().Fill(x.Patient),
                         status = ConstantHelper.STATUS.GetStatus(x.Status)

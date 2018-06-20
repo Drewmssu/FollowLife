@@ -9,7 +9,6 @@ namespace FollowLifeAPI.BE
         public string Complement { get; set; } = string.Empty;
         public string Number { get; set; } = string.Empty;
         public string District { get; set; } = string.Empty;
-        public int DistrictId { get; set; }
 
         public AddressBE Fill(Address a)
         {
@@ -19,7 +18,6 @@ namespace FollowLifeAPI.BE
             this.Street = a.Street;
             this.Neighborhood = a.Neighborhood;
             this.Number = a.Number;
-            this.DistrictId = a.DistrictId;
             this.Complement = string.IsNullOrEmpty(a.Complement) ? null : a.Complement;
             this.District = a.District.Name;
 

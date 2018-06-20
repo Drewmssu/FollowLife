@@ -195,6 +195,7 @@
     <Compile Include="BE\ItemBE.cs" />
     <Compile Include="BE\MedicalSpecialityBE.cs" />
     <Compile Include="BE\PatientBE.cs" />
+    <Compile Include="BE\UserBE.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
