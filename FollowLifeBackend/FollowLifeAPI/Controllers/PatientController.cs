@@ -380,14 +380,26 @@ namespace FollowLifeAPI.Controllers
                         response.Message = "Unauthorized";
                         return new ErrorResult(response, Request);
                     }
+                    if (model.PhoneNumber != null)
+                        user.PhoneNumber = model.PhoneNumber;
 
-                    user.PhoneNumber = model.PhoneNumber;
                     user.UpdatedOn = DateTime.Now;
-                    patient.Age = model.Age;
-                    patient.Weight = model.Weight;
-                    patient.Height = model.Height;
-                    patient.BloodType = model.BloodType;
-                    patient.Sex = model.Sex;
+
+                    if (!string.IsNullOrEmpty(model.Age))
+                        patient.Age = model.Age;
+
+                    if (model.Weight != null)
+                        patient.Weight = model.Weight;
+
+                    if (model.Height != null)
+                        patient.Height = model.Height;
+
+                    if (string.IsNullOrEmpty(model.BloodType))
+                        patient.BloodType = model.BloodType;
+
+                    if (string.IsNullOrEmpty(model.Sex))
+                        patient.Sex = model.Sex;
+
                     patient.UpdatedAt = DateTime.Now;
 
                     await context.SaveChangesAsync();

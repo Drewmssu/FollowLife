@@ -16,9 +16,9 @@ namespace FollowLifeAPI.Models.Patient
         [MinLength(2)]
         public string BloodType { get; set; } = string.Empty;
         [Range(0.10, 9.99)]
-        public decimal Height { get; set; }
+        public decimal? Height { get; set; }
         [Range(0.10, 999.99)]
-        public decimal Weight { get; set; }
+        public decimal? Weight { get; set; }
         [MaxLength(3)]
         public string Age { get; set; } = string.Empty;
     }

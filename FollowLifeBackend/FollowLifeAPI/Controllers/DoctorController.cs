@@ -15,6 +15,7 @@ using FollowLifeAPI.Extensions;
 using FollowLifeAPI.Models.Doctor;
 using FollowLifeAPI.Models.Appointment;
 using FollowLifeAPI.DataLayer;
+using FollowLifeAPI.Models.Prescription;
 
 namespace FollowLifeAPI.Controllers
 {
@@ -193,7 +194,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IHttpActionResult> Register(Register model)
+        public async Task<IHttpActionResult> Register([FromBody]Register model)
         {
             try
             {
@@ -331,7 +332,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPut]
         [Route("{doctorId}")]
-        public async Task<IHttpActionResult> Profile(int doctorId, DProfile model)
+        public async Task<IHttpActionResult> Profile(int doctorId, [FromBody]DProfile model)
         {
             try
             {
@@ -385,8 +386,12 @@ namespace FollowLifeAPI.Controllers
 
                     var address = doctor.Address;
 
-                    user.PhoneNumber = model.PhoneNumber;
-                    doctor.MedicIdentification = model.MedicalIdentification;
+                    if (!string.IsNullOrEmpty(model.PhoneNumber))                  
+                        user.PhoneNumber = model.PhoneNumber;
+
+                    if (!string.IsNullOrEmpty(model.MedicalIdentification))
+                        doctor.MedicIdentification = model.MedicalIdentification;
+
                     user.UpdatedOn = DateTime.Now;
                     doctor.UpdatedAt = DateTime.Now;
 
@@ -432,23 +437,27 @@ namespace FollowLifeAPI.Controllers
                     context.DoctorMedicalSpeciality.RemoveRange(doctor.DoctorMedicalSpeciality);
                     await context.SaveChangesAsync();
 
-                    if (model.MedicalSpecialities.Length > 0)
+                    if (model.MedicalSpecialities != null)
                     {
-                        foreach (var ms in model.MedicalSpecialities)
+                        if (model.MedicalSpecialities.Length > 0)
                         {
-                            context.DoctorMedicalSpeciality.Add(new DoctorMedicalSpeciality
+                            foreach (var ms in model.MedicalSpecialities)
                             {
-                                DoctorId = doctor.Id,
-                                MedicalSpecialityId = ms
-                            });
-                        }
+                                context.DoctorMedicalSpeciality.Add(new DoctorMedicalSpeciality
+                                {
+                                    DoctorId = doctor.Id,
+                                    MedicalSpecialityId = ms
+                                });
+                            }
 
-                        await context.SaveChangesAsync();
+                            await context.SaveChangesAsync();
+                        }
                     }
 
                     response.Result = new
                     {
-                        phoneNumber = model.PhoneNumber,
+                        phoneNumber = user.PhoneNumber,
+                        medicIdentification = doctor.MedicIdentification,
 
                         districtId = address?.DistrictId,
                         street = address?.Street,
@@ -484,7 +493,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("{doctorId}/membership")]
-        public async Task<IHttpActionResult> GenerateMembership(int doctorId, GenerateMembership model)
+        public async Task<IHttpActionResult> GenerateMembership(int doctorId, [FromBody]GenerateMembership model)
         {
             try
             {
@@ -753,7 +762,7 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(response, Request);
                     }
 
-                    if (appointment.AppointmentDate < DateTime.Now)
+                    if (appointment.AppointmentDate < DateTime.Now.Date)
                     {
                         response.Code = HttpStatusCode.NotFound;
                         response.Status = "error";
@@ -804,7 +813,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPost]
         [Route("{doctorId}/appointments")]
-        public async Task<IHttpActionResult> AddAppointment(int doctorId, AddAppointment model)
+        public async Task<IHttpActionResult> AddAppointment(int doctorId, [FromBody]AddAppointment model)
         {
             try
             {
@@ -1159,5 +1168,286 @@ namespace FollowLifeAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{doctorId}/patients/{patientId}/prescriptions")]
+        [Route("{doctorId}/patients/{patientId}/prescriptions/{prescriptionId}")]
+        public async Task<IHttpActionResult> GetPrescriptions(int doctorId, int patientId, int? prescriptionId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var doctor = await context.Doctor.FindAsync(doctorId);
+
+                if (doctor is null || doctor.UserId != userId)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var patient = await context.Patient.FindAsync(patientId);
+
+                if (patient is null)
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Patient does not exist";
+                    return new ErrorResult(response, Request);
+                }
+
+                var membership = await context.Membership.FirstOrDefaultAsync(x => x.DoctorId == doctor.Id &&
+                                                                                   x.PatientId == patient.Id &&
+                                                                                   x.Status == ConstantHelper.STATUS.CONFIRMED);
+
+                if (membership is null)
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Patient is not attended by this doctor";
+                    return new ErrorResult(response, Request);
+                }
+
+                if (prescriptionId.HasValue)
+                {
+                    var prescription = await context.Prescription.FindAsync(prescriptionId);
+
+                    if (prescription is null)
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Prescription does not exist";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (prescription.Status == ConstantHelper.STATUS.INACTIVE)
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "Prescription not available";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (prescription.DoctorId != doctor.Id)
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "Current user is not part of this prescription";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (prescription.PatientId != patient.Id)
+                    {
+                        response.Code = HttpStatusCode.Forbidden;
+                        response.Status = "error";
+                        response.Message = "Current patient is not part of this prescription";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (prescription.FinishedAt < DateTime.Now.Date)
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Prescription has expired";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    response.Status = "ok";
+                    response.Code = HttpStatusCode.OK;
+                    response.Result = new
+                    {
+                        frequency = prescription.Frencuency,
+                        quantity = prescription.Quantity,
+                        durationInDays = prescription.DurationInDays,
+                        description = prescription.Description,
+                        startsAt = prescription.StartedAt,
+                        expiresAt = prescription.FinishedAt,
+                        type = new PrescriptionTypeBE().Fill(prescription.PrescriptionType)
+                    };
+
+                    return Ok(response);
+                }
+
+                var today = DateTime.Now.Date;
+
+                response.Result = context.Prescription.Where(x => x.DoctorId == doctor.Id &&
+                                                                  x.PatientId == patient.Id &&
+                                                                  x.Status != ConstantHelper.STATUS.INACTIVE &&
+                                                                  x.FinishedAt >= today)
+                        .Select(x => new
+                        {
+                            frecuency = x.Frencuency,
+                            quantity = x.Quantity,
+                            durationInDays = x.DurationInDays,
+                            description = x.Description,
+                            startsdAt = x.StartedAt,
+                            expiresAt = x.FinishedAt,
+                            type = new PrescriptionTypeBE().Fill(x.PrescriptionType)
+                        }).ToList();
+
+                response.Status = "ok";
+                response.Code = HttpStatusCode.OK;
+
+                return Ok(response);
+            }
+            catch
+            {
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = "An error has ocurred";
+                return new ErrorResult(response, Request);
+            }
+        }
+
+        [HttpPost]
+        [Route("{doctorId}/patients/{patientId}/prescriptions")]
+        public async Task<IHttpActionResult> AddPrescription(int doctorId, int patientId, [FromBody]AddPrescription model)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    #region Validation
+
+                    if (model is null)
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = new ArgumentNullException().Message;
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (!ModelState.IsValid)
+                    {
+                        response.Code = HttpStatusCode.NoContent;
+                        response.Status = "error";
+                        response.Message = ModelState.ToString();
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (model.StartedAt >= DateTime.Now)
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Date can't be before than today";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    if (model.FinishedAt > DateTime.Now &&
+                        model.FinishedAt >= model.StartedAt)
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Date can't be before than today or before start date";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var userId = GetUserId();
+
+                    if (userId is null)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var user = await context.User.FindAsync(userId);
+
+                    if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var doctor = await context.Doctor.FindAsync(doctorId);
+
+                    if (doctor is null || doctor.UserId != userId)
+                    {
+                        response.Code = HttpStatusCode.Unauthorized;
+                        response.Status = "error";
+                        response.Message = "Unauthorized";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var patient = await context.Patient.FindAsync(patientId);
+
+                    if (patient is null)
+                    {
+                        response.Code = HttpStatusCode.BadRequest;
+                        response.Status = "error";
+                        response.Message = "Patient does not exist";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    var membership = await context.Membership.FirstOrDefaultAsync(x => x.DoctorId == doctor.Id &&
+                                                                                       x.PatientId == patientId &&
+                                                                                       x.Status == ConstantHelper.STATUS.ACTIVE);
+
+                    if (membership is null)
+                    {
+                        response.Code = HttpStatusCode.NotFound;
+                        response.Status = "error";
+                        response.Message = "Patient is not attended by this doctor";
+                        return new ErrorResult(response, Request);
+                    }
+
+                    #endregion
+
+                    var prescription = new Prescription
+                    {
+                        DoctorId = doctor.Id,
+                        PatientId = patientId,
+                        PrescriptionTypeId = model.PrescriptionTypeId,
+                        Frencuency = model.Frecuency,
+                        Quantity = model.Quantity,
+                        DurationInDays = model.DurationInDays,
+                        Description = model.Description,
+                        StartedAt = model.StartedAt,
+                        FinishedAt = model.FinishedAt,
+                        CreatedAt = DateTime.Now,
+                        Status = ConstantHelper.STATUS.ACTIVE,
+                    };
+
+                    await context.SaveChangesAsync();
+
+                    transaction.Complete();
+
+                    response.Status = "ok";
+                    response.Code = HttpStatusCode.Created;
+
+                    return Ok(response);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+            }
+            catch (Exception ex)
+            {
+                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
     }
 }

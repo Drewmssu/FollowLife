@@ -100,27 +100,6 @@
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Code" Type="varchar" MaxLength="3" />
         </EntityType>
-        <EntityType Name="Item">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="PrescriptionId" Type="int" Nullable="false" />
-          <Property Name="ItemTypeId" Type="int" />
-          <Property Name="Frencuency" Type="varchar" MaxLength="100" />
-          <Property Name="Quantity" Type="int" />
-          <Property Name="DurationInDays" Type="int" />
-          <Property Name="Description" Type="varchar" MaxLength="150" />
-          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
-        </EntityType>
-        <EntityType Name="ItemType">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="Code" Type="varchar" MaxLength="3" Nullable="false" />
-        </EntityType>
         <EntityType Name="MedicalSpeciality">
           <Key>
             <PropertyRef Name="Id" />
@@ -141,20 +120,6 @@
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="ExpiresAt" Type="datetime" Nullable="false" />
           <Property Name="Status" Type="varchar" MaxLength="3" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Notification">
-          <Key>
-            <PropertyRef Name="NotificationId" />
-          </Key>
-          <Property Name="NotificationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="Type" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="Title" Type="varchar" MaxLength="100" Nullable="false" />
-          <Property Name="Message" Type="varchar" MaxLength="255" Nullable="false" />
-          <Property Name="IsActive" Type="bit" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
-          <Property Name="UpdateDate" Type="datetime" />
-          <Property Name="UpdatedBy" Type="int" />
         </EntityType>
         <EntityType Name="Patient">
           <Key>
@@ -187,10 +152,26 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DoctorId" Type="int" Nullable="false" />
-          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="PrescriptionTypeId" Type="int" Nullable="false" />
+          <Property Name="Frencuency" Type="varchar" MaxLength="100" />
+          <Property Name="Quantity" Type="int" />
+          <Property Name="DurationInDays" Type="int" />
+          <Property Name="Description" Type="varchar" MaxLength="150" />
           <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="Status" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="FinishedAt" Type="datetime" Nullable="false" />
+          <Property Name="StartedAt" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PrescriptionType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Code" Type="varchar" MaxLength="3" Nullable="false" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -371,26 +352,14 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Item_ItemType">
-          <End Role="ItemType" Type="Self.ItemType" Multiplicity="0..1" />
-          <End Role="Item" Type="Self.Item" Multiplicity="*" />
+          <End Role="PrescriptionType" Type="Self.PrescriptionType" Multiplicity="1" />
+          <End Role="Prescription" Type="Self.Prescription" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="ItemType">
+            <Principal Role="PrescriptionType">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Item">
-              <PropertyRef Name="ItemTypeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Item_Prescription">
-          <End Role="Prescription" Type="Self.Prescription" Multiplicity="1" />
-          <End Role="Item" Type="Self.Item" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Prescription">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Item">
-              <PropertyRef Name="PrescriptionId" />
+            <Dependent Role="Prescription">
+              <PropertyRef Name="PrescriptionTypeId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -488,14 +457,12 @@
           <EntitySet Name="Indicator" EntityType="Self.Indicator" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="IndicatorEntry" EntityType="Self.IndicatorEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="IndicatorType" EntityType="Self.IndicatorType" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Item" EntityType="Self.Item" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ItemType" EntityType="Self.ItemType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MedicalSpeciality" EntityType="Self.MedicalSpeciality" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Membership" EntityType="Self.Membership" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Patient" EntityType="Self.Patient" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Plan" EntityType="Self.Plan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Prescription" EntityType="Self.Prescription" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PrescriptionType" EntityType="Self.PrescriptionType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UnitOfMeasurement" EntityType="Self.UnitOfMeasurement" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
@@ -548,12 +515,8 @@
             <End Role="IndicatorType" EntitySet="IndicatorType" />
           </AssociationSet>
           <AssociationSet Name="FK_Item_ItemType" Association="Self.FK_Item_ItemType">
-            <End Role="ItemType" EntitySet="ItemType" />
-            <End Role="Item" EntitySet="Item" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Item_Prescription" Association="Self.FK_Item_Prescription">
+            <End Role="PrescriptionType" EntitySet="PrescriptionType" />
             <End Role="Prescription" EntitySet="Prescription" />
-            <End Role="Item" EntitySet="Item" />
           </AssociationSet>
           <AssociationSet Name="FK_Membership_Doctor" Association="Self.FK_Membership_Doctor">
             <End Role="Doctor" EntitySet="Doctor" />
@@ -588,536 +551,60 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="FollowLifeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Address">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DistrictId" Type="Int32" Nullable="false" />
-          <Property Name="Street" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Neighborhood" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Complement" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Number" Type="String" MaxLength="5" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="District" Relationship="Self.FK_Address_District" FromRole="Address" ToRole="District" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_Doctor_Address" FromRole="Address" ToRole="Doctor" />
-        </EntityType>
-        <EntityType Name="Appointment">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PatientId" Type="Int32" />
-          <Property Name="DoctorId" Type="Int32" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="AppointmentDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CanceledAt" Type="DateTime" Precision="3" />
-          <Property Name="Reason" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
-        </EntityType>
-        <EntityType Name="Device">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="Token" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="User" Relationship="Self.FK_Device_User" FromRole="Device" ToRole="User" />
-        </EntityType>
-        <EntityType Name="District">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Address" Relationship="Self.FK_Address_District" FromRole="District" ToRole="Address" />
-        </EntityType>
-        <EntityType Name="Doctor">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="PlanId" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="MedicIdentification" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
-          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
-          <Property Name="AddressId" Type="Int32" />
-          <NavigationProperty Name="Address" Relationship="Self.FK_Doctor_Address" FromRole="Doctor" ToRole="Address" />
-          <NavigationProperty Name="Appointment" Relationship="Self.FK_Appointment_Doctor" FromRole="Doctor" ToRole="Appointment" />
-          <NavigationProperty Name="User" Relationship="Self.FK_Doctor_User" FromRole="Doctor" ToRole="User" />
-          <NavigationProperty Name="DoctorMedicalSpeciality" Relationship="Self.FK_DoctorMedicalSpeciality_Doctor" FromRole="Doctor" ToRole="DoctorMedicalSpeciality" />
-          <NavigationProperty Name="Membership" Relationship="Self.FK_Membership_Doctor" FromRole="Doctor" ToRole="Membership" />
-          <NavigationProperty Name="Prescription" Relationship="Self.FK_Prescription_Doctor" FromRole="Doctor" ToRole="Prescription" />
-        </EntityType>
-        <EntityType Name="DoctorMedicalSpeciality">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DoctorId" Type="Int32" Nullable="false" />
-          <Property Name="MedicalSpecialityId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_DoctorMedicalSpeciality_Doctor" FromRole="DoctorMedicalSpeciality" ToRole="Doctor" />
-          <NavigationProperty Name="MedicalSpeciality" Relationship="Self.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="DoctorMedicalSpeciality" ToRole="MedicalSpeciality" />
-        </EntityType>
-        <EntityType Name="IndicatorEntry">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IndicatorId" Type="Int32" Nullable="false" />
-          <Property Name="Value" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_IndicatorEntry_Indicator" FromRole="IndicatorEntry" ToRole="Indicator" />
-        </EntityType>
-        <EntityType Name="Item">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PrescriptionId" Type="Int32" Nullable="false" />
-          <Property Name="ItemTypeId" Type="Int32" />
-          <Property Name="Frencuency" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Quantity" Type="Int32" />
-          <Property Name="DurationInDays" Type="Int32" />
-          <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="ItemType" Relationship="Self.FK_Item_ItemType" FromRole="Item" ToRole="ItemType" />
-          <NavigationProperty Name="Prescription" Relationship="Self.FK_Item_Prescription" FromRole="Item" ToRole="Prescription" />
-        </EntityType>
-        <EntityType Name="ItemType">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Item" Relationship="Self.FK_Item_ItemType" FromRole="ItemType" ToRole="Item" />
-        </EntityType>
-        <EntityType Name="MedicalSpeciality">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="DoctorMedicalSpeciality" Relationship="Self.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="MedicalSpeciality" ToRole="DoctorMedicalSpeciality" />
-        </EntityType>
-        <EntityType Name="Membership">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DoctorId" Type="Int32" Nullable="false" />
-          <Property Name="PatientId" Type="Int32" />
-          <Property Name="ReferencedEmail" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Token" Type="String" MaxLength="6" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="ExpiresAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_Membership_Doctor" FromRole="Membership" ToRole="Doctor" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Membership_Patient" FromRole="Membership" ToRole="Patient" />
-        </EntityType>
-        <EntityType Name="Notification">
-          <Key>
-            <PropertyRef Name="NotificationId" />
-          </Key>
-          <Property Name="NotificationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Title" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Message" Type="String" MaxLength="255" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="IsActive" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateDate" Type="DateTime" Precision="3" />
-          <Property Name="UpdatedBy" Type="Int32" />
-        </EntityType>
-        <EntityType Name="Patient">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="PlanId" Type="Int32" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Age" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
-          <Property Name="BloodType" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
-          <Property Name="Weight" Type="Decimal" Precision="5" Scale="2" />
-          <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
-          <Property Name="Height" Type="Decimal" Precision="2" Scale="1" />
-          <NavigationProperty Name="Appointment" Relationship="Self.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
-          <NavigationProperty Name="Membership" Relationship="Self.FK_Membership_Patient" FromRole="Patient" ToRole="Membership" />
-          <NavigationProperty Name="Plan" Relationship="Self.FK_Patient_Package" FromRole="Patient" ToRole="Plan" />
-          <NavigationProperty Name="User" Relationship="Self.FK_Patient_User" FromRole="Patient" ToRole="User" />
-          <NavigationProperty Name="Prescription" Relationship="Self.FK_Prescription_Patient" FromRole="Patient" ToRole="Prescription" />
-          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
-        </EntityType>
-        <EntityType Name="Plan">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="AcceptedPatients" Type="Int32" />
-          <Property Name="Price" Type="Decimal" Precision="18" Scale="2" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Patient_Package" FromRole="Plan" ToRole="Patient" />
-        </EntityType>
-        <EntityType Name="Prescription">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="DoctorId" Type="Int32" Nullable="false" />
-          <Property Name="PatientId" Type="Int32" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_Prescription_Doctor" FromRole="Prescription" ToRole="Doctor" />
-          <NavigationProperty Name="Item" Relationship="Self.FK_Item_Prescription" FromRole="Prescription" ToRole="Item" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Prescription_Patient" FromRole="Prescription" ToRole="Patient" />
-        </EntityType>
-        <EntityType Name="Role">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="25" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="ShortName" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="User" Relationship="Self.FK_User_Role" FromRole="Role" ToRole="User" />
-        </EntityType>
-        <EntityType Name="UnitOfMeasurement">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Code" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="IndicatorType" Relationship="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement" FromRole="UnitOfMeasurement" ToRole="IndicatorType" />
-        </EntityType>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Password" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="RoleId" Type="Int32" Nullable="false" />
-          <Property Name="FirstName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="LastName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Status" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="PhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="ProfilePicture" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="SessionToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="LastIPConnection" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdatedOn" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Device" Relationship="Self.FK_Device_User" FromRole="User" ToRole="Device" />
-          <NavigationProperty Name="Doctor" Relationship="Self.FK_Doctor_User" FromRole="User" ToRole="Doctor" />
-          <NavigationProperty Name="Patient" Relationship="Self.FK_Patient_User" FromRole="User" ToRole="Patient" />
-          <NavigationProperty Name="Role" Relationship="Self.FK_User_Role" FromRole="User" ToRole="Role" />
-        </EntityType>
-        <Association Name="FK_Address_District">
-          <End Role="District" Type="Self.District" Multiplicity="1" />
-          <End Role="Address" Type="Self.Address" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="District">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Address">
-              <PropertyRef Name="DistrictId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Doctor_Address">
-          <End Role="Address" Type="Self.Address" Multiplicity="0..1" />
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Address">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Doctor">
-              <PropertyRef Name="AddressId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Appointment_Doctor">
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="0..1" />
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Doctor">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="DoctorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Appointment_Patient">
-          <End Role="Patient" Type="Self.Patient" Multiplicity="0..1" />
-          <End Role="Appointment" Type="Self.Appointment" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Patient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Appointment">
-              <PropertyRef Name="PatientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Device_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Device" Type="Self.Device" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Device">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Doctor_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Doctor">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_DoctorMedicalSpeciality_Doctor">
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
-          <End Role="DoctorMedicalSpeciality" Type="Self.DoctorMedicalSpeciality" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Doctor">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="DoctorMedicalSpeciality">
-              <PropertyRef Name="DoctorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Membership_Doctor">
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
-          <End Role="Membership" Type="Self.Membership" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Doctor">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Membership">
-              <PropertyRef Name="DoctorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Prescription_Doctor">
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
-          <End Role="Prescription" Type="Self.Prescription" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Doctor">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Prescription">
-              <PropertyRef Name="DoctorId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_DoctorMedicalSpeciality_MedicalSpeciality">
-          <End Role="MedicalSpeciality" Type="Self.MedicalSpeciality" Multiplicity="1" />
-          <End Role="DoctorMedicalSpeciality" Type="Self.DoctorMedicalSpeciality" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MedicalSpeciality">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="DoctorMedicalSpeciality">
-              <PropertyRef Name="MedicalSpecialityId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Item_ItemType">
-          <End Role="ItemType" Type="Self.ItemType" Multiplicity="0..1" />
-          <End Role="Item" Type="Self.Item" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="ItemType">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Item">
-              <PropertyRef Name="ItemTypeId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Item_Prescription">
-          <End Role="Prescription" Type="Self.Prescription" Multiplicity="1" />
-          <End Role="Item" Type="Self.Item" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Prescription">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Item">
-              <PropertyRef Name="PrescriptionId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Membership_Patient">
-          <End Role="Patient" Type="Self.Patient" Multiplicity="0..1" />
-          <End Role="Membership" Type="Self.Membership" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Patient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Membership">
-              <PropertyRef Name="PatientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Patient_Package">
-          <End Role="Plan" Type="Self.Plan" Multiplicity="0..1" />
-          <End Role="Patient" Type="Self.Patient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Plan">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Patient">
-              <PropertyRef Name="PlanId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Patient_User">
-          <End Role="User" Type="Self.User" Multiplicity="1" />
-          <End Role="Patient" Type="Self.Patient" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Patient">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Prescription_Patient">
-          <End Role="Patient" Type="Self.Patient" Multiplicity="1" />
-          <End Role="Prescription" Type="Self.Prescription" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Patient">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Prescription">
-              <PropertyRef Name="PatientId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_User_Role">
-          <End Role="Role" Type="Self.Role" Multiplicity="1" />
-          <End Role="User" Type="Self.User" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Role">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="User">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="FollowLifeEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Address" EntityType="Self.Address" />
-          <EntitySet Name="Appointment" EntityType="Self.Appointment" />
-          <EntitySet Name="Device" EntityType="Self.Device" />
-          <EntitySet Name="District" EntityType="Self.District" />
-          <EntitySet Name="Doctor" EntityType="Self.Doctor" />
-          <EntitySet Name="DoctorMedicalSpeciality" EntityType="Self.DoctorMedicalSpeciality" />
-          <EntitySet Name="IndicatorEntry" EntityType="Self.IndicatorEntry" />
-          <EntitySet Name="Item" EntityType="Self.Item" />
-          <EntitySet Name="ItemType" EntityType="Self.ItemType" />
-          <EntitySet Name="MedicalSpeciality" EntityType="Self.MedicalSpeciality" />
-          <EntitySet Name="Membership" EntityType="Self.Membership" />
-          <EntitySet Name="Notification" EntityType="Self.Notification" />
-          <EntitySet Name="Patient" EntityType="Self.Patient" />
-          <EntitySet Name="Plan" EntityType="Self.Plan" />
-          <EntitySet Name="Prescription" EntityType="Self.Prescription" />
-          <EntitySet Name="Role" EntityType="Self.Role" />
-          <EntitySet Name="UnitOfMeasurement" EntityType="Self.UnitOfMeasurement" />
-          <EntitySet Name="User" EntityType="Self.User" />
-          <AssociationSet Name="FK_Address_District" Association="Self.FK_Address_District">
+          <EntitySet Name="Address" EntityType="FollowLifeModel.Address" />
+          <EntitySet Name="Appointment" EntityType="FollowLifeModel.Appointment" />
+          <EntitySet Name="Device" EntityType="FollowLifeModel.Device" />
+          <EntitySet Name="District" EntityType="FollowLifeModel.District" />
+          <EntitySet Name="Doctor" EntityType="FollowLifeModel.Doctor" />
+          <EntitySet Name="DoctorMedicalSpeciality" EntityType="FollowLifeModel.DoctorMedicalSpeciality" />
+          <EntitySet Name="Indicator" EntityType="FollowLifeModel.Indicator" />
+          <EntitySet Name="IndicatorEntry" EntityType="FollowLifeModel.IndicatorEntry" />
+          <EntitySet Name="IndicatorType" EntityType="FollowLifeModel.IndicatorType" />
+          <EntitySet Name="MedicalSpeciality" EntityType="FollowLifeModel.MedicalSpeciality" />
+          <EntitySet Name="Membership" EntityType="FollowLifeModel.Membership" />
+          <EntitySet Name="Patient" EntityType="FollowLifeModel.Patient" />
+          <EntitySet Name="Plan" EntityType="FollowLifeModel.Plan" />
+          <EntitySet Name="PrescriptionType" EntityType="FollowLifeModel.PrescriptionType" />
+          <EntitySet Name="Role" EntityType="FollowLifeModel.Role" />
+          <EntitySet Name="UnitOfMeasurement" EntityType="FollowLifeModel.UnitOfMeasurement" />
+          <EntitySet Name="User" EntityType="FollowLifeModel.User" />
+          <AssociationSet Name="FK_Address_District" Association="FollowLifeModel.FK_Address_District">
             <End Role="District" EntitySet="District" />
             <End Role="Address" EntitySet="Address" />
           </AssociationSet>
-          <AssociationSet Name="FK_Doctor_Address" Association="Self.FK_Doctor_Address">
+          <AssociationSet Name="FK_Doctor_Address" Association="FollowLifeModel.FK_Doctor_Address">
             <End Role="Address" EntitySet="Address" />
             <End Role="Doctor" EntitySet="Doctor" />
           </AssociationSet>
-          <AssociationSet Name="FK_Appointment_Doctor" Association="Self.FK_Appointment_Doctor">
+          <AssociationSet Name="FK_Appointment_Doctor" Association="FollowLifeModel.FK_Appointment_Doctor">
             <End Role="Doctor" EntitySet="Doctor" />
             <End Role="Appointment" EntitySet="Appointment" />
           </AssociationSet>
-          <AssociationSet Name="FK_Appointment_Patient" Association="Self.FK_Appointment_Patient">
+          <AssociationSet Name="FK_Appointment_Patient" Association="FollowLifeModel.FK_Appointment_Patient">
             <End Role="Patient" EntitySet="Patient" />
             <End Role="Appointment" EntitySet="Appointment" />
           </AssociationSet>
-          <AssociationSet Name="FK_Device_User" Association="Self.FK_Device_User">
+          <AssociationSet Name="FK_Device_User" Association="FollowLifeModel.FK_Device_User">
             <End Role="User" EntitySet="User" />
             <End Role="Device" EntitySet="Device" />
           </AssociationSet>
-          <AssociationSet Name="FK_Doctor_User" Association="Self.FK_Doctor_User">
+          <AssociationSet Name="FK_Doctor_User" Association="FollowLifeModel.FK_Doctor_User">
             <End Role="User" EntitySet="User" />
             <End Role="Doctor" EntitySet="Doctor" />
           </AssociationSet>
-          <AssociationSet Name="FK_DoctorMedicalSpeciality_Doctor" Association="Self.FK_DoctorMedicalSpeciality_Doctor">
+          <AssociationSet Name="FK_DoctorMedicalSpeciality_Doctor" Association="FollowLifeModel.FK_DoctorMedicalSpeciality_Doctor">
             <End Role="Doctor" EntitySet="Doctor" />
             <End Role="DoctorMedicalSpeciality" EntitySet="DoctorMedicalSpeciality" />
           </AssociationSet>
-          <AssociationSet Name="FK_Membership_Doctor" Association="Self.FK_Membership_Doctor">
+          <AssociationSet Name="FK_Membership_Doctor" Association="FollowLifeModel.FK_Membership_Doctor">
             <End Role="Doctor" EntitySet="Doctor" />
             <End Role="Membership" EntitySet="Membership" />
           </AssociationSet>
-          <AssociationSet Name="FK_Prescription_Doctor" Association="Self.FK_Prescription_Doctor">
-            <End Role="Doctor" EntitySet="Doctor" />
-            <End Role="Prescription" EntitySet="Prescription" />
-          </AssociationSet>
-          <AssociationSet Name="FK_DoctorMedicalSpeciality_MedicalSpeciality" Association="Self.FK_DoctorMedicalSpeciality_MedicalSpeciality">
+          <AssociationSet Name="FK_DoctorMedicalSpeciality_MedicalSpeciality" Association="FollowLifeModel.FK_DoctorMedicalSpeciality_MedicalSpeciality">
             <End Role="MedicalSpeciality" EntitySet="MedicalSpeciality" />
             <End Role="DoctorMedicalSpeciality" EntitySet="DoctorMedicalSpeciality" />
           </AssociationSet>
-          <AssociationSet Name="FK_Item_ItemType" Association="Self.FK_Item_ItemType">
-            <End Role="ItemType" EntitySet="ItemType" />
-            <End Role="Item" EntitySet="Item" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Item_Prescription" Association="Self.FK_Item_Prescription">
-            <End Role="Prescription" EntitySet="Prescription" />
-            <End Role="Item" EntitySet="Item" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Membership_Patient" Association="Self.FK_Membership_Patient">
-            <End Role="Patient" EntitySet="Patient" />
-            <End Role="Membership" EntitySet="Membership" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Patient_Package" Association="Self.FK_Patient_Package">
-            <End Role="Plan" EntitySet="Plan" />
-            <End Role="Patient" EntitySet="Patient" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Patient_User" Association="Self.FK_Patient_User">
-            <End Role="User" EntitySet="User" />
-            <End Role="Patient" EntitySet="Patient" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Prescription_Patient" Association="Self.FK_Prescription_Patient">
-            <End Role="Patient" EntitySet="Patient" />
-            <End Role="Prescription" EntitySet="Prescription" />
-          </AssociationSet>
-          <AssociationSet Name="FK_User_Role" Association="Self.FK_User_Role">
-            <End Role="Role" EntitySet="Role" />
-            <End Role="User" EntitySet="User" />
-          </AssociationSet>
-          <EntitySet Name="Indicator" EntityType="FollowLifeModel.Indicator" />
-          <EntitySet Name="IndicatorType" EntityType="FollowLifeModel.IndicatorType" />
           <AssociationSet Name="FK_Indicator_IndicatorType" Association="FollowLifeModel.FK_Indicator_IndicatorType">
             <End Role="IndicatorType" EntitySet="IndicatorType" />
             <End Role="Indicator" EntitySet="Indicator" />
@@ -1134,7 +621,115 @@
             <End Role="UnitOfMeasurement" EntitySet="UnitOfMeasurement" />
             <End Role="IndicatorType" EntitySet="IndicatorType" />
           </AssociationSet>
-        </EntityContainer>
+          <AssociationSet Name="FK_Membership_Patient" Association="FollowLifeModel.FK_Membership_Patient">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Membership" EntitySet="Membership" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Patient_Package" Association="FollowLifeModel.FK_Patient_Package">
+            <End Role="Plan" EntitySet="Plan" />
+            <End Role="Patient" EntitySet="Patient" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Patient_User" Association="FollowLifeModel.FK_Patient_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Patient" EntitySet="Patient" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Role" Association="FollowLifeModel.FK_User_Role">
+            <End Role="Role" EntitySet="Role" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+          <EntitySet Name="Prescription" EntityType="FollowLifeModel.Prescription" />
+          <AssociationSet Name="FK_Prescription_Doctor" Association="FollowLifeModel.FK_Prescription_Doctor">
+            <End Role="Doctor" EntitySet="Doctor" />
+            <End Role="Prescription" EntitySet="Prescription" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Prescription_Patient" Association="FollowLifeModel.FK_Prescription_Patient">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Prescription" EntitySet="Prescription" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Item_ItemType" Association="FollowLifeModel.FK_Item_ItemType">
+            <End Role="PrescriptionType" EntitySet="PrescriptionType" />
+            <End Role="Prescription" EntitySet="Prescription" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Address">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DistrictId" Type="Int32" Nullable="false" />
+          <Property Name="Street" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Neighborhood" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Complement" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Number" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="District" Relationship="FollowLifeModel.FK_Address_District" FromRole="Address" ToRole="District" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_Doctor_Address" FromRole="Address" ToRole="Doctor" />
+        </EntityType>
+        <EntityType Name="Appointment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" />
+          <Property Name="DoctorId" Type="Int32" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="AppointmentDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CanceledAt" Type="DateTime" Precision="3" />
+          <Property Name="Reason" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_Appointment_Doctor" FromRole="Appointment" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Appointment_Patient" FromRole="Appointment" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Token" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="User" Relationship="FollowLifeModel.FK_Device_User" FromRole="Device" ToRole="User" />
+        </EntityType>
+        <EntityType Name="District">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Address" Relationship="FollowLifeModel.FK_Address_District" FromRole="District" ToRole="Address" />
+        </EntityType>
+        <EntityType Name="Doctor">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="PlanId" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MedicIdentification" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <Property Name="AddressId" Type="Int32" />
+          <NavigationProperty Name="Address" Relationship="FollowLifeModel.FK_Doctor_Address" FromRole="Doctor" ToRole="Address" />
+          <NavigationProperty Name="Appointment" Relationship="FollowLifeModel.FK_Appointment_Doctor" FromRole="Doctor" ToRole="Appointment" />
+          <NavigationProperty Name="User" Relationship="FollowLifeModel.FK_Doctor_User" FromRole="Doctor" ToRole="User" />
+          <NavigationProperty Name="DoctorMedicalSpeciality" Relationship="FollowLifeModel.FK_DoctorMedicalSpeciality_Doctor" FromRole="Doctor" ToRole="DoctorMedicalSpeciality" />
+          <NavigationProperty Name="Membership" Relationship="FollowLifeModel.FK_Membership_Doctor" FromRole="Doctor" ToRole="Membership" />
+          <NavigationProperty Name="Prescription" Relationship="FollowLifeModel.FK_Prescription_Doctor" FromRole="Doctor" ToRole="Prescription" />
+        </EntityType>
+        <EntityType Name="DoctorMedicalSpeciality">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="MedicalSpecialityId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_DoctorMedicalSpeciality_Doctor" FromRole="DoctorMedicalSpeciality" ToRole="Doctor" />
+          <NavigationProperty Name="MedicalSpeciality" Relationship="FollowLifeModel.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="DoctorMedicalSpeciality" ToRole="MedicalSpeciality" />
+        </EntityType>
         <EntityType Name="Indicator">
           <Key>
             <PropertyRef Name="Id" />
@@ -1150,6 +745,16 @@
           <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Indicator_Patient" FromRole="Indicator" ToRole="Patient" />
           <NavigationProperty Name="IndicatorEntry" Relationship="FollowLifeModel.FK_IndicatorEntry_Indicator" FromRole="Indicator" ToRole="IndicatorEntry" />
         </EntityType>
+        <EntityType Name="IndicatorEntry">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IndicatorId" Type="Int32" Nullable="false" />
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_IndicatorEntry_Indicator" FromRole="IndicatorEntry" ToRole="Indicator" />
+        </EntityType>
         <EntityType Name="IndicatorType">
           <Key>
             <PropertyRef Name="Id" />
@@ -1161,6 +766,221 @@
           <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_Indicator_IndicatorType" FromRole="IndicatorType" ToRole="Indicator" />
           <NavigationProperty Name="UnitOfMeasurement" Relationship="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement" FromRole="IndicatorType" ToRole="UnitOfMeasurement" />
         </EntityType>
+        <EntityType Name="MedicalSpeciality">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="DoctorMedicalSpeciality" Relationship="FollowLifeModel.FK_DoctorMedicalSpeciality_MedicalSpeciality" FromRole="MedicalSpeciality" ToRole="DoctorMedicalSpeciality" />
+        </EntityType>
+        <EntityType Name="Membership">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="PatientId" Type="Int32" />
+          <Property Name="ReferencedEmail" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Token" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ExpiresAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_Membership_Doctor" FromRole="Membership" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Membership_Patient" FromRole="Membership" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="PlanId" Type="Int32" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="UpdatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Age" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="BloodType" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Weight" Type="Decimal" Precision="5" Scale="2" />
+          <Property Name="Sex" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="Height" Type="Decimal" Precision="2" Scale="1" />
+          <NavigationProperty Name="Appointment" Relationship="FollowLifeModel.FK_Appointment_Patient" FromRole="Patient" ToRole="Appointment" />
+          <NavigationProperty Name="Indicator" Relationship="FollowLifeModel.FK_Indicator_Patient" FromRole="Patient" ToRole="Indicator" />
+          <NavigationProperty Name="Membership" Relationship="FollowLifeModel.FK_Membership_Patient" FromRole="Patient" ToRole="Membership" />
+          <NavigationProperty Name="Plan" Relationship="FollowLifeModel.FK_Patient_Package" FromRole="Patient" ToRole="Plan" />
+          <NavigationProperty Name="User" Relationship="FollowLifeModel.FK_Patient_User" FromRole="Patient" ToRole="User" />
+          <NavigationProperty Name="Prescription" Relationship="FollowLifeModel.FK_Prescription_Patient" FromRole="Patient" ToRole="Prescription" />
+        </EntityType>
+        <EntityType Name="Plan">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="AcceptedPatients" Type="Int32" />
+          <Property Name="Price" Type="Decimal" Precision="18" Scale="2" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Patient_Package" FromRole="Plan" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="PrescriptionType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Prescription" Relationship="FollowLifeModel.FK_Item_ItemType" FromRole="PrescriptionType" ToRole="Prescription" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="ShortName" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="User" Relationship="FollowLifeModel.FK_User_Role" FromRole="Role" ToRole="User" />
+        </EntityType>
+        <EntityType Name="UnitOfMeasurement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="IndicatorType" Relationship="FollowLifeModel.FK_IndicatorType_UnitOfMeasurement" FromRole="UnitOfMeasurement" ToRole="IndicatorType" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="RoleId" Type="Int32" Nullable="false" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="ProfilePicture" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="SessionToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="LastIPConnection" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedOn" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Device" Relationship="FollowLifeModel.FK_Device_User" FromRole="User" ToRole="Device" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_Doctor_User" FromRole="User" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Patient_User" FromRole="User" ToRole="Patient" />
+          <NavigationProperty Name="Role" Relationship="FollowLifeModel.FK_User_Role" FromRole="User" ToRole="Role" />
+        </EntityType>
+        <Association Name="FK_Address_District">
+          <End Type="FollowLifeModel.District" Role="District" Multiplicity="1" />
+          <End Type="FollowLifeModel.Address" Role="Address" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="District">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Address">
+              <PropertyRef Name="DistrictId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Doctor_Address">
+          <End Type="FollowLifeModel.Address" Role="Address" Multiplicity="0..1" />
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Address">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Doctor">
+              <PropertyRef Name="AddressId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Appointment_Doctor">
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="0..1" />
+          <End Type="FollowLifeModel.Appointment" Role="Appointment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Appointment">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Appointment_Patient">
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="0..1" />
+          <End Type="FollowLifeModel.Appointment" Role="Appointment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Appointment">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Device_User">
+          <End Type="FollowLifeModel.User" Role="User" Multiplicity="1" />
+          <End Type="FollowLifeModel.Device" Role="Device" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Device">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Doctor_User">
+          <End Type="FollowLifeModel.User" Role="User" Multiplicity="1" />
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Doctor">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DoctorMedicalSpeciality_Doctor">
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="1" />
+          <End Type="FollowLifeModel.DoctorMedicalSpeciality" Role="DoctorMedicalSpeciality" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DoctorMedicalSpeciality">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Membership_Doctor">
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="1" />
+          <End Type="FollowLifeModel.Membership" Role="Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DoctorMedicalSpeciality_MedicalSpeciality">
+          <End Type="FollowLifeModel.MedicalSpeciality" Role="MedicalSpeciality" Multiplicity="1" />
+          <End Type="FollowLifeModel.DoctorMedicalSpeciality" Role="DoctorMedicalSpeciality" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalSpeciality">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DoctorMedicalSpeciality">
+              <PropertyRef Name="MedicalSpecialityId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Indicator_IndicatorType">
           <End Type="FollowLifeModel.IndicatorType" Role="IndicatorType" Multiplicity="1" />
           <End Type="FollowLifeModel.Indicator" Role="Indicator" Multiplicity="*" />
@@ -1209,7 +1029,111 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <Association Name="FK_Membership_Patient">
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="0..1" />
+          <End Type="FollowLifeModel.Membership" Role="Membership" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Membership">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Patient_Package">
+          <End Type="FollowLifeModel.Plan" Role="Plan" Multiplicity="0..1" />
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Plan">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="PlanId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Patient_User">
+          <End Type="FollowLifeModel.User" Role="User" Multiplicity="1" />
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Role">
+          <End Type="FollowLifeModel.Role" Role="Role" Multiplicity="1" />
+          <End Type="FollowLifeModel.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Role">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="RoleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Prescription">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="PrescriptionTypeId" Type="Int32" Nullable="false" />
+          <Property Name="Frencuency" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Quantity" Type="Int32" />
+          <Property Name="DurationInDays" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="FinishedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="StartedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Doctor" Relationship="FollowLifeModel.FK_Prescription_Doctor" FromRole="Prescription" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="FollowLifeModel.FK_Prescription_Patient" FromRole="Prescription" ToRole="Patient" />
+          <NavigationProperty Name="PrescriptionType" Relationship="FollowLifeModel.FK_Item_ItemType" FromRole="Prescription" ToRole="PrescriptionType" />
+        </EntityType>
+        <Association Name="FK_Prescription_Doctor">
+          <End Type="FollowLifeModel.Doctor" Role="Doctor" Multiplicity="1" />
+          <End Type="FollowLifeModel.Prescription" Role="Prescription" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Prescription">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Prescription_Patient">
+          <End Type="FollowLifeModel.Patient" Role="Patient" Multiplicity="1" />
+          <End Type="FollowLifeModel.Prescription" Role="Prescription" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Prescription">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Item_ItemType">
+          <End Type="FollowLifeModel.PrescriptionType" Role="PrescriptionType" Multiplicity="1" />
+          <End Type="FollowLifeModel.Prescription" Role="Prescription" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PrescriptionType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Prescription">
+              <PropertyRef Name="PrescriptionTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -1218,218 +1142,71 @@
           <EntitySetMapping Name="Address">
             <EntityTypeMapping TypeName="FollowLifeModel.Address">
               <MappingFragment StoreEntitySet="Address">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
-                <ScalarProperty Name="Street" ColumnName="Street" />
-                <ScalarProperty Name="Neighborhood" ColumnName="Neighborhood" />
-                <ScalarProperty Name="Complement" ColumnName="Complement" />
-                <ScalarProperty Name="Number" ColumnName="Number" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Number" ColumnName="Number" />
+                <ScalarProperty Name="Complement" ColumnName="Complement" />
+                <ScalarProperty Name="Neighborhood" ColumnName="Neighborhood" />
+                <ScalarProperty Name="Street" ColumnName="Street" />
+                <ScalarProperty Name="DistrictId" ColumnName="DistrictId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Appointment">
             <EntityTypeMapping TypeName="FollowLifeModel.Appointment">
               <MappingFragment StoreEntitySet="Appointment">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
-                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="AppointmentDate" ColumnName="AppointmentDate" />
-                <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />
-                <ScalarProperty Name="Reason" ColumnName="Reason" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="CanceledAt" ColumnName="CanceledAt" />
+                <ScalarProperty Name="AppointmentDate" ColumnName="AppointmentDate" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Device">
             <EntityTypeMapping TypeName="FollowLifeModel.Device">
               <MappingFragment StoreEntitySet="Device">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Token" ColumnName="Token" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="District">
             <EntityTypeMapping TypeName="FollowLifeModel.District">
               <MappingFragment StoreEntitySet="District">
-                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Doctor">
             <EntityTypeMapping TypeName="FollowLifeModel.Doctor">
               <MappingFragment StoreEntitySet="Doctor">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="PlanId" ColumnName="PlanId" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="MedicIdentification" ColumnName="MedicIdentification" />
-                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
                 <ScalarProperty Name="AddressId" ColumnName="AddressId" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="MedicIdentification" ColumnName="MedicIdentification" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="DoctorMedicalSpeciality">
             <EntityTypeMapping TypeName="FollowLifeModel.DoctorMedicalSpeciality">
               <MappingFragment StoreEntitySet="DoctorMedicalSpeciality">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
                 <ScalarProperty Name="MedicalSpecialityId" ColumnName="MedicalSpecialityId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="IndicatorEntry">
-            <EntityTypeMapping TypeName="FollowLifeModel.IndicatorEntry">
-              <MappingFragment StoreEntitySet="IndicatorEntry">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="IndicatorId" ColumnName="IndicatorId" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Item">
-            <EntityTypeMapping TypeName="FollowLifeModel.Item">
-              <MappingFragment StoreEntitySet="Item">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="PrescriptionId" ColumnName="PrescriptionId" />
-                <ScalarProperty Name="ItemTypeId" ColumnName="ItemTypeId" />
-                <ScalarProperty Name="Frencuency" ColumnName="Frencuency" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="DurationInDays" ColumnName="DurationInDays" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ItemType">
-            <EntityTypeMapping TypeName="FollowLifeModel.ItemType">
-              <MappingFragment StoreEntitySet="ItemType">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="MedicalSpeciality">
-            <EntityTypeMapping TypeName="FollowLifeModel.MedicalSpeciality">
-              <MappingFragment StoreEntitySet="MedicalSpeciality">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Membership">
-            <EntityTypeMapping TypeName="FollowLifeModel.Membership">
-              <MappingFragment StoreEntitySet="Membership">
-                <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
-                <ScalarProperty Name="ReferencedEmail" ColumnName="ReferencedEmail" />
-                <ScalarProperty Name="Token" ColumnName="Token" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="ExpiresAt" ColumnName="ExpiresAt" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Notification">
-            <EntityTypeMapping TypeName="FollowLifeModel.Notification">
-              <MappingFragment StoreEntitySet="Notification">
-                <ScalarProperty Name="NotificationId" ColumnName="NotificationId" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Message" ColumnName="Message" />
-                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
-                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Patient">
-            <EntityTypeMapping TypeName="FollowLifeModel.Patient">
-              <MappingFragment StoreEntitySet="Patient">
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="PlanId" ColumnName="PlanId" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
-                <ScalarProperty Name="Age" ColumnName="Age" />
-                <ScalarProperty Name="BloodType" ColumnName="BloodType" />
-                <ScalarProperty Name="Weight" ColumnName="Weight" />
-                <ScalarProperty Name="Sex" ColumnName="Sex" />
-                <ScalarProperty Name="Height" ColumnName="Height" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Plan">
-            <EntityTypeMapping TypeName="FollowLifeModel.Plan">
-              <MappingFragment StoreEntitySet="Plan">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="AcceptedPatients" ColumnName="AcceptedPatients" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Prescription">
-            <EntityTypeMapping TypeName="FollowLifeModel.Prescription">
-              <MappingFragment StoreEntitySet="Prescription">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
-                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Role">
-            <EntityTypeMapping TypeName="FollowLifeModel.Role">
-              <MappingFragment StoreEntitySet="Role">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="ShortName" ColumnName="ShortName" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="UnitOfMeasurement">
-            <EntityTypeMapping TypeName="FollowLifeModel.UnitOfMeasurement">
-              <MappingFragment StoreEntitySet="UnitOfMeasurement">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Code" ColumnName="Code" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="User">
-            <EntityTypeMapping TypeName="FollowLifeModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Password" ColumnName="Password" />
-                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
-                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-                <ScalarProperty Name="LastName" ColumnName="LastName" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="ProfilePicture" ColumnName="ProfilePicture" />
-                <ScalarProperty Name="SessionToken" ColumnName="SessionToken" />
-                <ScalarProperty Name="LastIPConnection" ColumnName="LastIPConnection" />
-                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
-                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1446,12 +1223,138 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="IndicatorEntry">
+            <EntityTypeMapping TypeName="FollowLifeModel.IndicatorEntry">
+              <MappingFragment StoreEntitySet="IndicatorEntry">
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="IndicatorId" ColumnName="IndicatorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="IndicatorType">
             <EntityTypeMapping TypeName="FollowLifeModel.IndicatorType">
               <MappingFragment StoreEntitySet="IndicatorType">
                 <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="UnitOfMeasurementId" ColumnName="UnitOfMeasurementId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MedicalSpeciality">
+            <EntityTypeMapping TypeName="FollowLifeModel.MedicalSpeciality">
+              <MappingFragment StoreEntitySet="MedicalSpeciality">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Membership">
+            <EntityTypeMapping TypeName="FollowLifeModel.Membership">
+              <MappingFragment StoreEntitySet="Membership">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ExpiresAt" ColumnName="ExpiresAt" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="ReferencedEmail" ColumnName="ReferencedEmail" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Patient">
+            <EntityTypeMapping TypeName="FollowLifeModel.Patient">
+              <MappingFragment StoreEntitySet="Patient">
+                <ScalarProperty Name="Height" ColumnName="Height" />
+                <ScalarProperty Name="Sex" ColumnName="Sex" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="BloodType" ColumnName="BloodType" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Plan">
+            <EntityTypeMapping TypeName="FollowLifeModel.Plan">
+              <MappingFragment StoreEntitySet="Plan">
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="AcceptedPatients" ColumnName="AcceptedPatients" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PrescriptionType">
+            <EntityTypeMapping TypeName="FollowLifeModel.PrescriptionType">
+              <MappingFragment StoreEntitySet="PrescriptionType">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Role">
+            <EntityTypeMapping TypeName="FollowLifeModel.Role">
+              <MappingFragment StoreEntitySet="Role">
+                <ScalarProperty Name="ShortName" ColumnName="ShortName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UnitOfMeasurement">
+            <EntityTypeMapping TypeName="FollowLifeModel.UnitOfMeasurement">
+              <MappingFragment StoreEntitySet="UnitOfMeasurement">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User">
+            <EntityTypeMapping TypeName="FollowLifeModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="LastIPConnection" ColumnName="LastIPConnection" />
+                <ScalarProperty Name="SessionToken" ColumnName="SessionToken" />
+                <ScalarProperty Name="ProfilePicture" ColumnName="ProfilePicture" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prescription">
+            <EntityTypeMapping TypeName="FollowLifeModel.Prescription">
+              <MappingFragment StoreEntitySet="Prescription">
+                <ScalarProperty Name="StartedAt" ColumnName="StartedAt" />
+                <ScalarProperty Name="FinishedAt" ColumnName="FinishedAt" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="DurationInDays" ColumnName="DurationInDays" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Frencuency" ColumnName="Frencuency" />
+                <ScalarProperty Name="PrescriptionTypeId" ColumnName="PrescriptionTypeId" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

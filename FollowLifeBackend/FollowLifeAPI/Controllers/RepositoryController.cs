@@ -55,13 +55,13 @@ namespace FollowLifeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("repository/itemTypes")]
-        [Route("repository/itemTypes/{itemTypeId}")]
-        public async Task<IHttpActionResult> ItemTypes(int? itemTypeId = null)
+        [Route("repository/prescriptionTypes")]
+        [Route("repository/prescriptionTypes/{prescriptionTypeId}")]
+        public async Task<IHttpActionResult> PrescriptionTypes(int? itemTypeId = null)
         {
             if (itemTypeId.HasValue)
             {
-                var element = await context.ItemType.FindAsync(itemTypeId);
+                var element = await context.PrescriptionType.FindAsync(itemTypeId);
 
                 if (element != null)
                     response.Result = new Element
@@ -75,7 +75,7 @@ namespace FollowLifeAPI.Controllers
             }
 
             var result = new ConcurrentBag<Element>();
-            var collection = await context.ItemType.ToListAsync();
+            var collection = await context.PrescriptionType.ToListAsync();
 
             Parallel.ForEach(collection, element =>
             {

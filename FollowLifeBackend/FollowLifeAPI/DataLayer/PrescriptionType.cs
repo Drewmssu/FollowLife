@@ -12,18 +12,19 @@ namespace FollowLifeAPI.DataLayer
     using System;
     using System.Collections.Generic;
     
-    public partial class Item
+    public partial class PrescriptionType
     {
-        public int Id { get; set; }
-        public int PrescriptionId { get; set; }
-        public Nullable<int> ItemTypeId { get; set; }
-        public string Frencuency { get; set; }
-        public Nullable<int> Quantity { get; set; }
-        public Nullable<int> DurationInDays { get; set; }
-        public string Description { get; set; }
-        public System.DateTime CreatedAt { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public PrescriptionType()
+        {
+            this.Prescription = new HashSet<Prescription>();
+        }
     
-        public virtual ItemType ItemType { get; set; }
-        public virtual Prescription Prescription { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Prescription> Prescription { get; set; }
     }
 }

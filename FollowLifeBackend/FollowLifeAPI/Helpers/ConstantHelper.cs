@@ -48,11 +48,12 @@ namespace FollowLifeAPI.Helpers
             public const string DOCTOR = "DOC";
         }
 
-        public static class ITEMTYPE
+        public static class PRESCRIPTION_TYPE
         {
             public const string MEDICATION = "MED";
             public const string ACTIVITY = "ACV";
             public const string DIET = "DIE";
+            public const string OTHER = "OTH";
         }
 
         public static class PLAN

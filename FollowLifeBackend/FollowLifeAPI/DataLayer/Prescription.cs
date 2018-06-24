@@ -14,20 +14,21 @@ namespace FollowLifeAPI.DataLayer
     
     public partial class Prescription
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Prescription()
-        {
-            this.Item = new HashSet<Item>();
-        }
-    
         public int Id { get; set; }
         public int DoctorId { get; set; }
-        public int PatientId { get; set; }
+        public int PrescriptionTypeId { get; set; }
+        public string Frencuency { get; set; }
+        public Nullable<int> Quantity { get; set; }
+        public Nullable<int> DurationInDays { get; set; }
+        public string Description { get; set; }
         public System.DateTime CreatedAt { get; set; }
+        public int PatientId { get; set; }
+        public string Status { get; set; }
+        public System.DateTime FinishedAt { get; set; }
+        public System.DateTime StartedAt { get; set; }
     
         public virtual Doctor Doctor { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Item> Item { get; set; }
         public virtual Patient Patient { get; set; }
+        public virtual PrescriptionType PrescriptionType { get; set; }
     }
 }
