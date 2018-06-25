@@ -127,7 +127,7 @@ namespace FollowLifeAPI.Controllers
 
                 response.Result = new
                 {
-                    user.Id,
+                    user.Doctor.FirstOrDefault(x => x.UserId == user.Id).Id,
                     user.SessionToken,
                     user.FirstName,
                     user.LastName,
@@ -386,7 +386,7 @@ namespace FollowLifeAPI.Controllers
 
                     var address = doctor.Address;
 
-                    if (!string.IsNullOrEmpty(model.PhoneNumber))                  
+                    if (!string.IsNullOrEmpty(model.PhoneNumber))
                         user.PhoneNumber = model.PhoneNumber;
 
                     if (!string.IsNullOrEmpty(model.MedicalIdentification))
@@ -1447,6 +1447,110 @@ namespace FollowLifeAPI.Controllers
             catch (Exception ex)
             {
                 return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{doctorId}/patients/{patientId}/prescriptions")]
+        public async Task<IHttpActionResult> DeletePrescription(int doctorId, int patientId, int prescriptionId)
+        {
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var userId = GetUserId();
+
+                if (userId is null)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var user = await context.User.FindAsync(userId);
+
+                if (user.RoleId != ConstantHelper.ROLE.ID.DOCTOR)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var doctor = await context.Doctor.FindAsync(doctorId);
+
+                if (doctor is null || doctor.UserId != userId)
+                {
+                    response.Code = HttpStatusCode.Unauthorized;
+                    response.Status = "error";
+                    response.Message = "Unauthorized";
+                    return new ErrorResult(response, Request);
+                }
+
+                var patient = await context.Patient.FindAsync(patientId);
+
+                if (patient is null)
+                {
+                    response.Code = HttpStatusCode.BadRequest;
+                    response.Status = "error";
+                    response.Message = "Patient does not exist";
+                    return new ErrorResult(response, Request);
+                }
+
+                var membership = await context.Membership.FirstOrDefaultAsync(x => x.DoctorId == doctor.Id &&
+                                                                                   x.PatientId == patientId &&
+                                                                                   x.Status == ConstantHelper.STATUS.ACTIVE);
+
+                if (membership is null)
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Patient is not attended by this doctor";
+                    return new ErrorResult(response, Request);
+                }
+
+                var prescription = await context.Prescription.FindAsync(prescriptionId);
+
+                if (prescription is null)
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Prescription does not exist";
+                    return new ErrorResult(response, Request);
+                }
+
+                if (prescription.DoctorId != doctor.Id)
+                {
+                    response.Code = HttpStatusCode.Forbidden;
+                    response.Status = "error";
+                    response.Message = "Wrong doctor";
+                    return new ErrorResult(response, Request);
+                }
+
+                if (prescription.PatientId != patient.Id)
+                {
+                    response.Code = HttpStatusCode.Forbidden;
+                    response.Status = "error";
+                    response.Message = "Wrong patient";
+                    return new ErrorResult(response, Request);
+                }
+
+                if (prescription.Status != ConstantHelper.STATUS.ACTIVE)
+                {
+                    response.Code = HttpStatusCode.NotFound;
+                    response.Status = "error";
+                    response.Message = "Prescription does not exist";
+                    return new ErrorResult(response, Request);
+                }
+
+                prescription.Status = ConstantHelper.STATUS.INACTIVE;
+
+                await context.SaveChangesAsync();
+                transaction.Complete();
+
+                response.Code = HttpStatusCode.OK;
+                response.Status = "ok";
+
+                return Ok(response);
             }
         }
     }

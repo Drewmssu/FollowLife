@@ -17,7 +17,6 @@ namespace FollowLifeAPI.Controllers
             try
             {
                 var token = Request.Headers.GetValues(ConstantHelper.TOKEN_HEADER_NAME).First();
-                var test = Request.Headers.GetValues(ConstantHelper.TOKEN_HEADER_NAME);
 
                 if (!TokenLogic.ValidateToken(token, ConstantHelper.TOKEN_TIMEOUT))
                     return null;
