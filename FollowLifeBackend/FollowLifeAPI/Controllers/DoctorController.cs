@@ -1315,8 +1315,7 @@ namespace FollowLifeAPI.Controllers
                             description = x.Description,
                             startsdAt = x.StartedAt,
                             expiresAt = x.FinishedAt,
-                            type = x.PrescriptionType.Name,
-                            status = ConstantHelper.STATUS.GetStatus(x.Status)
+                            type = x.PrescriptionType.Name
                         }).ToList();
 
                 response.Status = "ok";

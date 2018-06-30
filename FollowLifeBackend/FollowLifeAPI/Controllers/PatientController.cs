@@ -1102,7 +1102,7 @@ namespace FollowLifeAPI.Controllers
                     return new ErrorResult(response, Request);
                 }
 
-                var patient = await context.Patient.FindAsync(doctorId);
+                var patient = await context.Patient.FindAsync(patientId);
 
                 if (patient is null || patient.UserId != userId)
                 {
@@ -1208,7 +1208,7 @@ namespace FollowLifeAPI.Controllers
                             description = x.Description,
                             startsdAt = x.StartedAt,
                             expiresAt = x.FinishedAt,
-                            type = new PrescriptionTypeBE().Fill(x.PrescriptionType)
+                            type = x.PrescriptionType.Name,
                         }).ToList();
 
                 response.Status = "ok";
@@ -1216,11 +1216,11 @@ namespace FollowLifeAPI.Controllers
 
                 return Ok(response);
             }
-            catch
+            catch(Exception e)
             {
                 response.Code = HttpStatusCode.BadRequest;
                 response.Status = "error";
-                response.Message = "An error has ocurred";
+                response.Message = e.Message;
                 return new ErrorResult(response, Request);
             }
         }
