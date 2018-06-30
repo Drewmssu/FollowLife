@@ -11,7 +11,6 @@ namespace FollowLifeAPI.BE
     {
         public int ItemId { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string Code { get; set; } = string.Empty;
 
         public JObject Fill(PrescriptionType pt)
         {
@@ -19,6 +18,7 @@ namespace FollowLifeAPI.BE
                 return null;
 
             var prescriptionType = new JObject(
+                new JProperty("id", pt.Id),
                 new JProperty("name", pt.Name));
 
             return prescriptionType;

@@ -6,8 +6,8 @@ namespace FollowLifeAPI.Models.Appointment
 {
     public class AddAppointment
     {
-        public int? PatientId { get; set; } = null;
-        public int? DoctorId { get; set; } = null;
+        public int? PatientId { get; set; }
+        public int? DoctorId { get; set; }
         [Required]
         public DateTime AppointmentDate { get; set; }
         public string Reason { get; set; } = string.Empty;

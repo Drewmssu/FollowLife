@@ -661,7 +661,9 @@ namespace FollowLifeAPI.Controllers
                     //TODO: Validate if patient membership is active (up to date on his payments)
                     //TODO: Returns indicator (IMPORTANT)
 
-                    return Ok(new
+                    response.Status = "ok";
+                    response.Code = HttpStatusCode.OK;
+                    response.Result = new
                     {
                         profileImage = ImageHelper.GetImageURL(patient.User.ProfilePicture),
                         name = patient.User.FirstName,
@@ -670,8 +672,12 @@ namespace FollowLifeAPI.Controllers
                         height = patient.Height,
                         weight = patient.Weight,
                         bloodType = patient.BloodType,
-                        sex = patient.Sex
-                    });
+                        sex = patient.Sex,
+                        email = patient.User.Email,
+                        phoneNumber = patient.User.PhoneNumber
+                    };
+
+                    return Ok(response);
                 }
 
                 response.Result = doctor.Membership.Where(x => x.DoctorId == doctor.Id &&
@@ -679,7 +685,7 @@ namespace FollowLifeAPI.Controllers
                     .Select(x => new
                     {
                         id = x.PatientId,
-                        name = x.Patient.User.FirstName + x.Patient.User.LastName,
+                        name = x.Patient.User.FirstName + " " + x.Patient.User.LastName,
                         profileImage = ImageHelper.GetImageURL(x.Patient.User.ProfilePicture)
                     }).ToList();
 
@@ -775,9 +781,10 @@ namespace FollowLifeAPI.Controllers
                     response.Result = new
                     {
                         appointmentDate = appointment.AppointmentDate,
+                        patient = new PatientBE().Fill(appointment.Patient),
                         reason = appointment.Reason,
-                        status = ConstantHelper.STATUS.GetStatus(appointment.Status),
-                        patient = new PatientBE().Fill(appointment.Patient)
+                        createdAt = appointment.CreatedAt,
+                        status = ConstantHelper.STATUS.GetStatus(appointment.Status)
                     };
 
                     return Ok(response);
@@ -915,13 +922,19 @@ namespace FollowLifeAPI.Controllers
                     return Ok(response);
                 }
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException e)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = e.Message;
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 
@@ -1281,7 +1294,8 @@ namespace FollowLifeAPI.Controllers
                         description = prescription.Description,
                         startsAt = prescription.StartedAt,
                         expiresAt = prescription.FinishedAt,
-                        type = new PrescriptionTypeBE().Fill(prescription.PrescriptionType)
+                        type = new PrescriptionTypeBE().Fill(prescription.PrescriptionType),
+                        status = ConstantHelper.STATUS.GetStatus(prescription.Status)
                     };
 
                     return Ok(response);
@@ -1301,7 +1315,8 @@ namespace FollowLifeAPI.Controllers
                             description = x.Description,
                             startsdAt = x.StartedAt,
                             expiresAt = x.FinishedAt,
-                            type = new PrescriptionTypeBE().Fill(x.PrescriptionType)
+                            type = x.PrescriptionType.Name,
+                            status = ConstantHelper.STATUS.GetStatus(x.Status)
                         }).ToList();
 
                 response.Status = "ok";
@@ -1309,11 +1324,11 @@ namespace FollowLifeAPI.Controllers
 
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
                 response.Code = HttpStatusCode.BadRequest;
                 response.Status = "error";
-                response.Message = "An error has ocurred";
+                response.Message = e.Message;
                 return new ErrorResult(response, Request);
             }
         }
@@ -1344,20 +1359,11 @@ namespace FollowLifeAPI.Controllers
                         return new ErrorResult(response, Request);
                     }
 
-                    if (model.StartedAt >= DateTime.Now)
+                    if (model.StartedAt <= DateTime.Now)
                     {
                         response.Code = HttpStatusCode.BadRequest;
                         response.Status = "error";
                         response.Message = "Date can't be before than today";
-                        return new ErrorResult(response, Request);
-                    }
-
-                    if (model.FinishedAt > DateTime.Now &&
-                        model.FinishedAt >= model.StartedAt)
-                    {
-                        response.Code = HttpStatusCode.BadRequest;
-                        response.Status = "error";
-                        response.Message = "Date can't be before than today or before start date";
                         return new ErrorResult(response, Request);
                     }
 
@@ -1403,7 +1409,7 @@ namespace FollowLifeAPI.Controllers
 
                     var membership = await context.Membership.FirstOrDefaultAsync(x => x.DoctorId == doctor.Id &&
                                                                                        x.PatientId == patientId &&
-                                                                                       x.Status == ConstantHelper.STATUS.ACTIVE);
+                                                                                       x.Status == ConstantHelper.STATUS.CONFIRMED);
 
                     if (membership is null)
                     {
@@ -1425,11 +1431,12 @@ namespace FollowLifeAPI.Controllers
                         DurationInDays = model.DurationInDays,
                         Description = model.Description,
                         StartedAt = model.StartedAt,
-                        FinishedAt = model.FinishedAt,
+                        FinishedAt = model.StartedAt.Date.AddDays(model.DurationInDays.Value),
                         CreatedAt = DateTime.Now,
                         Status = ConstantHelper.STATUS.ACTIVE,
                     };
 
+                    context.Prescription.Add(prescription);
                     await context.SaveChangesAsync();
 
                     transaction.Complete();
@@ -1440,13 +1447,19 @@ namespace FollowLifeAPI.Controllers
                     return Ok(response);
                 }
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException e)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, "Null request");
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = e.Message;
+                return new ErrorResult(response, Request);
             }
             catch (Exception ex)
             {
-                return new HttpActionResult(HttpStatusCode.BadRequest, ex.Message);
+                response.Code = HttpStatusCode.BadRequest;
+                response.Status = "error";
+                response.Message = ex.Message;
+                return new ErrorResult(response, Request);
             }
         }
 

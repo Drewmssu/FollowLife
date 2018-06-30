@@ -329,7 +329,7 @@ namespace FollowLifeAPI.Controllers
 
         [HttpPut]
         [Route("{patientId}")]
-        public async Task<IHttpActionResult> Profile(int patientId, PProfile model)
+        public async Task<IHttpActionResult> Profile(int patientId, [FromBody]PProfile model)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace FollowLifeAPI.Controllers
                     {
                         response.Code = HttpStatusCode.NoContent;
                         response.Status = "error";
-                        response.Message = ModelState.ToString();
+                        response.Message = "Invalid Model";
                         return new ErrorResult(response, Request);
                     }
 
@@ -380,10 +380,10 @@ namespace FollowLifeAPI.Controllers
                         response.Message = "Unauthorized";
                         return new ErrorResult(response, Request);
                     }
-                    if (model.PhoneNumber != null)
-                        user.PhoneNumber = model.PhoneNumber;
-
                     user.UpdatedOn = DateTime.Now;
+
+                    if (!string.IsNullOrEmpty(model.PhoneNumber))
+                        user.PhoneNumber = model.PhoneNumber;
 
                     if (!string.IsNullOrEmpty(model.Age))
                         patient.Age = model.Age;
@@ -394,10 +394,10 @@ namespace FollowLifeAPI.Controllers
                     if (model.Height != null)
                         patient.Height = model.Height;
 
-                    if (string.IsNullOrEmpty(model.BloodType))
+                    if (!string.IsNullOrEmpty(model.BloodType))
                         patient.BloodType = model.BloodType;
 
-                    if (string.IsNullOrEmpty(model.Sex))
+                    if (!string.IsNullOrEmpty(model.Sex))
                         patient.Sex = model.Sex;
 
                     patient.UpdatedAt = DateTime.Now;
@@ -606,7 +606,9 @@ namespace FollowLifeAPI.Controllers
                         lastName = doctor.User.LastName,
                         medicIndentification = doctor.MedicIdentification,
                         address = new AddressBE().Fill(doctor.Address),
-                        medicalSpecialities = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality))
+                        medicalSpecialities = new MedicalSpecialityBE().Fill(doctor.DoctorMedicalSpeciality.Select(x => x.MedicalSpeciality)),
+                        email = doctor.User.Email,
+                        phoneNumber = doctor.User.PhoneNumber
                     };
                     response.Code = HttpStatusCode.OK;
                     response.Status = "ok";
@@ -621,7 +623,8 @@ namespace FollowLifeAPI.Controllers
                     {
                         id = x.DoctorId,
                         name = x.Doctor.User.FirstName + " " + x.Doctor.User.LastName,
-                        profileImage = ImageHelper.GetImageURL(x.Doctor.User.ProfilePicture)
+                        profileImage = ImageHelper.GetImageURL(x.Doctor.User.ProfilePicture),
+                        address = new AddressBE().Fill(x.Doctor.Address)
                     }).ToList();
 
                 response.Code = HttpStatusCode.OK;
